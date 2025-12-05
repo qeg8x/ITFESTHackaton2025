@@ -1,0 +1,100 @@
+# ============================================
+# Цифровой университет - Docker Compose
+# Полный стек: Fresh + PostgreSQL + Ollama
+# ============================================
+
+version: '3.8'
+
+services:
+  # ==========================================
+  # Fresh приложение
+  # ==========================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digital-university-app
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-digital_university}
+      - DENO_ENV=${DENO_ENV:-production}
+      - OLLAMA_URL=http://ollama:11434
+      - PORT=8000
+      - ADMIN_KEY=${ADMIN_KEY:-change-me-in-production}
+      - UPDATE_WORKER_ENABLED=${UPDATE_WORKER_ENABLED:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/debug?action=health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ==========================================
+  # PostgreSQL база данных
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: digital-university-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-digital_university}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql:/docker-entrypoint-initdb.d:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${POSTGRES_DB:-digital_university}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Ollama LLM (опционально)
+  # ==========================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: digital-university-ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - app-network
+    restart: unless-stopped
+    # Раскомментируйте для GPU поддержки:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+# ==========================================
+# Volumes
+# ==========================================
+volumes:
+  postgres_data:
+    name: digital-university-postgres-data
+  ollama_data:
+    name: digital-university-ollama-data
+
+# ==========================================
+# Networks
+# ==========================================
+networks:
+  app-network:
+    name: digital-university-network
+    driver: bridge

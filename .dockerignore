@@ -1,0 +1,58 @@
+# ============================================
+# Docker Ignore
+# ============================================
+
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Build artifacts
+_fresh/
+.fresh/
+
+# Node (если есть)
+node_modules/
+
+# Documentation (не нужна в образе)
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Docker files (не копировать в образ)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+
+# Coverage
+coverage/
+.nyc_output/
