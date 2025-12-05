@@ -1,0 +1,32 @@
+# Fresh build output
+_fresh/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+node_modules/
+
+# Deno
+deno.lock
+
+# Database
+*.sql.backup
