@@ -2,6 +2,8 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
+import * as $_404 from './routes/_404.tsx';
+import * as $_500 from './routes/_500.tsx';
 import * as $_app from './routes/_app.tsx';
 import * as $api_admin_update_now from './routes/api/admin/update-now.ts';
 import * as $api_debug from './routes/api/debug.ts';
@@ -13,12 +15,15 @@ import * as $api_universities_index from './routes/api/universities/index.ts';
 import * as $index from './routes/index.tsx';
 import * as $universities_id_ from './routes/universities/[id].tsx';
 import * as $universities_index from './routes/universities/index.tsx';
+import * as $HomePage from './islands/HomePage.tsx';
 import * as $UniversityProfile from './islands/UniversityProfile.tsx';
 import * as $UniversitySelector from './islands/UniversitySelector.tsx';
 import { type Manifest } from '$fresh/server.ts';
 
 const manifest = {
   routes: {
+    './routes/_404.tsx': $_404,
+    './routes/_500.tsx': $_500,
     './routes/_app.tsx': $_app,
     './routes/api/admin/update-now.ts': $api_admin_update_now,
     './routes/api/debug.ts': $api_debug,
@@ -32,6 +37,7 @@ const manifest = {
     './routes/universities/index.tsx': $universities_index,
   },
   islands: {
+    './islands/HomePage.tsx': $HomePage,
     './islands/UniversityProfile.tsx': $UniversityProfile,
     './islands/UniversitySelector.tsx': $UniversitySelector,
   },
