@@ -228,6 +228,30 @@ export interface University {
   student_count?: number;
   faculty_count?: number;
   
+  // Расширенные поля "Об университете"
+  leadership?: string;
+  achievements?: string;
+  accreditations?: string;
+  notable_alumni?: string;
+  research_focus?: string;
+  special_programs?: string;
+  
+  // Координаты и локация
+  latitude?: number;
+  longitude?: number;
+  campus_location?: string;
+  
+  // Медиа
+  campus_photos?: string[];
+  videos?: Array<{ url: string; title?: string }>;
+  
+  // Переводы
+  translations?: {
+    ru?: { name?: string; description?: string; mission?: string };
+    kk?: { name?: string; description?: string; mission?: string };
+    en?: { name?: string; description?: string; mission?: string };
+  };
+  
   // Основные разделы
   programs: Program[];
   tuition_general?: TuitionGeneral;

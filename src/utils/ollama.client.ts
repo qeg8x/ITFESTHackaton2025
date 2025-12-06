@@ -193,6 +193,11 @@ export const callOllama = async (
 };
 
 /**
+ * Alias для callOllama для генерации текста
+ */
+export const callOllamaForText = callOllama;
+
+/**
  * Вызвать Ollama для извлечения JSON
  * @param prompt - промпт (может включать схему)
  * @param schema - описание ожидаемой JSON схемы (опционально)

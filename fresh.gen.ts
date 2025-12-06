@@ -14,21 +14,26 @@ import * as $api_admin_universities from './routes/api/admin/universities.ts';
 import * as $api_admin_universities_id_profile from './routes/api/admin/universities/[id]/profile.ts';
 import * as $api_admin_universities_id_programs from './routes/api/admin/universities/[id]/programs.ts';
 import * as $api_admin_update_now from './routes/api/admin/update-now.ts';
+import * as $api_chat from './routes/api/chat.ts';
 import * as $api_debug from './routes/api/debug.ts';
 import * as $api_filters from './routes/api/filters.ts';
 import * as $api_parser from './routes/api/parser.ts';
+import * as $api_search_autocomplete from './routes/api/search/autocomplete.ts';
 import * as $api_search_create from './routes/api/search/create.ts';
 import * as $api_search_universities from './routes/api/search/universities.ts';
 import * as $api_search_verify from './routes/api/search/verify.ts';
 import * as $api_test_features from './routes/api/test/features.ts';
 import * as $api_universities_id_ from './routes/api/universities/[id].ts';
 import * as $api_universities_id_profile from './routes/api/universities/[id]/profile.ts';
+import * as $api_universities_compare from './routes/api/universities/compare.ts';
+import * as $api_universities_filtered from './routes/api/universities/filtered.ts';
 import * as $api_universities_index from './routes/api/universities/index.ts';
 import * as $index from './routes/index.tsx';
 import * as $universities_id_ from './routes/universities/[id].tsx';
 import * as $universities_index from './routes/universities/index.tsx';
 import * as $HomePage from './islands/HomePage.tsx';
 import * as $HomePageV2 from './islands/HomePageV2.tsx';
+import * as $MainPage from './islands/MainPage.tsx';
 import * as $UniversityProfile from './islands/UniversityProfile.tsx';
 import * as $UniversitySearch from './islands/UniversitySearch.tsx';
 import * as $UniversitySelector from './islands/UniversitySelector.tsx';
@@ -66,15 +71,19 @@ const manifest = {
     './routes/api/admin/universities/[id]/profile.ts': $api_admin_universities_id_profile,
     './routes/api/admin/universities/[id]/programs.ts': $api_admin_universities_id_programs,
     './routes/api/admin/update-now.ts': $api_admin_update_now,
+    './routes/api/chat.ts': $api_chat,
     './routes/api/debug.ts': $api_debug,
     './routes/api/filters.ts': $api_filters,
     './routes/api/parser.ts': $api_parser,
+    './routes/api/search/autocomplete.ts': $api_search_autocomplete,
     './routes/api/search/create.ts': $api_search_create,
     './routes/api/search/universities.ts': $api_search_universities,
     './routes/api/search/verify.ts': $api_search_verify,
     './routes/api/test/features.ts': $api_test_features,
     './routes/api/universities/[id].ts': $api_universities_id_,
     './routes/api/universities/[id]/profile.ts': $api_universities_id_profile,
+    './routes/api/universities/compare.ts': $api_universities_compare,
+    './routes/api/universities/filtered.ts': $api_universities_filtered,
     './routes/api/universities/index.ts': $api_universities_index,
     './routes/index.tsx': $index,
     './routes/universities/[id].tsx': $universities_id_,
@@ -83,6 +92,7 @@ const manifest = {
   islands: {
     './islands/HomePage.tsx': $HomePage,
     './islands/HomePageV2.tsx': $HomePageV2,
+    './islands/MainPage.tsx': $MainPage,
     './islands/UniversityProfile.tsx': $UniversityProfile,
     './islands/UniversitySearch.tsx': $UniversitySearch,
     './islands/UniversitySelector.tsx': $UniversitySelector,

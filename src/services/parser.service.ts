@@ -20,6 +20,8 @@ const PARSER_CONFIG = {
   maxRetries: 3,
   llmRetries: 3, // Retry для LLM парсинга
   llmRetryDelay: 2000, // Задержка между retry
+  maxChunkSize: 12000, // Максимальный размер одного чанка для LLM
+  chunkOverlap: 500, // Перекрытие между чанками для контекста
 };
 
 /**
@@ -142,8 +144,101 @@ export const fetchAndHashWebsite = async (url: string): Promise<FetchResult> => 
 };
 
 /**
+ * Разбить текст на чанки для обработки
+ * @param text - исходный текст
+ * @param maxSize - максимальный размер чанка
+ * @param overlap - перекрытие между чанками
+ * @returns массив чанков
+ */
+const splitIntoChunks = (text: string, maxSize: number, overlap: number): string[] => {
+  if (text.length <= maxSize) {
+    return [text];
+  }
+
+  const chunks: string[] = [];
+  let start = 0;
+
+  while (start < text.length) {
+    let end = Math.min(start + maxSize, text.length);
+    
+    // Попробовать разбить на границе параграфа или предложения
+    if (end < text.length) {
+      const lastParagraph = text.lastIndexOf('\n\n', end);
+      const lastSentence = text.lastIndexOf('. ', end);
+      const lastNewline = text.lastIndexOf('\n', end);
+      
+      if (lastParagraph > start + maxSize / 2) {
+        end = lastParagraph + 2;
+      } else if (lastSentence > start + maxSize / 2) {
+        end = lastSentence + 2;
+      } else if (lastNewline > start + maxSize / 2) {
+        end = lastNewline + 1;
+      }
+    }
+    
+    chunks.push(text.slice(start, end));
+    start = end - overlap;
+    
+    if (start >= text.length - overlap) break;
+  }
+
+  logger.info('Split text into chunks', {
+    originalLength: text.length,
+    chunksCount: chunks.length,
+    chunkSizes: chunks.map(c => c.length),
+  });
+
+  return chunks;
+};
+
+/**
+ * Объединить результаты парсинга нескольких чанков
+ * @param results - массив частичных профилей
+ * @returns объединённый профиль
+ */
+const mergeProfileResults = (results: Partial<University>[]): Partial<University> => {
+  if (results.length === 0) return {};
+  if (results.length === 1) return results[0];
+
+  const merged: Partial<University> = { ...results[0] };
+  
+  for (let i = 1; i < results.length; i++) {
+    const result = results[i];
+    
+    // Объединить программы (избегая дубликатов)
+    if (result.programs?.length) {
+      const existingIds = new Set(merged.programs?.map(p => p.id) || []);
+      const newPrograms = result.programs.filter(p => !existingIds.has(p.id));
+      merged.programs = [...(merged.programs || []), ...newPrograms];
+    }
+    
+    // Объединить стипендии
+    if (result.scholarships?.length) {
+      const existingNames = new Set(merged.scholarships?.map(s => s.name) || []);
+      const newScholarships = result.scholarships.filter(s => !existingNames.has(s.name));
+      merged.scholarships = [...(merged.scholarships || []), ...newScholarships];
+    }
+    
+    // Объединить рейтинги
+    if (result.rankings?.length) {
+      merged.rankings = [...(merged.rankings || []), ...result.rankings];
+    }
+    
+    // Заполнить пустые поля
+    for (const key of Object.keys(result) as (keyof University)[]) {
+      if (!merged[key] && result[key]) {
+        (merged as Record<string, unknown>)[key] = result[key];
+      }
+    }
+  }
+  
+  return merged;
+};
+
+/**
  * Преобразовать Markdown в профиль университета через LLM (версия 2)
  * Использует улучшенный промпт с retry логикой
+ * Поддерживает разбиение на части для больших текстов
  * @param markdown - текст в формате Markdown
  * @param sourceUrl - URL источника
  * @param existingData - существующие данные для контекста
@@ -160,6 +255,62 @@ export const markdownToUniversityProfile = async (
     hasExistingData: !!existingData,
   });
 
+  // Разбить на чанки если текст слишком большой
+  const chunks = splitIntoChunks(markdown, PARSER_CONFIG.maxChunkSize, PARSER_CONFIG.chunkOverlap);
+  
+  if (chunks.length > 1) {
+    logger.info('Processing in multiple chunks', { chunksCount: chunks.length });
+    
+    const results: Partial<University>[] = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      logger.debug(`Processing chunk ${i + 1}/${chunks.length}`);
+      
+      try {
+        const chunkResult = await parseSingleChunk(chunks[i], sourceUrl, i === 0 ? existingData : undefined);
+        results.push(chunkResult);
+      } catch (err) {
+        logger.warn(`Chunk ${i + 1} parsing failed`, { error: err });
+        // Продолжаем с остальными чанками
+      }
+      
+      // Небольшая пауза между чанками чтобы не перегрузить LLM
+      if (i < chunks.length - 1) {
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+    
+    if (results.length === 0) {
+      throw new ParserError('All chunks failed to parse', 'LLM_ERROR', { chunksCount: chunks.length });
+    }
+    
+    const merged = mergeProfileResults(results);
+    
+    // Добавить metadata
+    const completenessScore = calculateCompletenessScore(merged as University);
+    merged.metadata = {
+      parsed_at: new Date().toISOString(),
+      source_url: sourceUrl,
+      completeness_score: completenessScore,
+      missing_fields: getMissingFieldsList(merged),
+      notes: `Parsed in ${chunks.length} chunks, ${results.length} successful`,
+    };
+    
+    return merged;
+  }
+
+  // Одиночный чанк - обычная обработка
+  return parseSingleChunk(markdown, sourceUrl, existingData);
+};
+
+/**
+ * Парсить один чанк текста
+ */
+const parseSingleChunk = async (
+  markdown: string,
+  sourceUrl: string,
+  existingData?: Partial<University>
+): Promise<Partial<University>> => {
   let lastError: Error | null = null;
 
   // Retry логика
@@ -469,6 +620,195 @@ const validateDegreeLevel = (level?: string): 'Bachelor' | 'Master' | 'PhD' => {
 };
 
 /**
+ * Известные категории специализаций
+ */
+const SPECIALIZATION_KEYWORDS: Record<string, string[]> = {
+  'STEM': ['computer', 'engineering', 'math', 'physics', 'chemistry', 'biology', 'science', 'technology', 'информатика', 'инженер', 'математика', 'физика', 'химия', 'биология'],
+  'Business': ['business', 'management', 'finance', 'marketing', 'economics', 'mba', 'бизнес', 'менеджмент', 'финанс', 'маркетинг', 'экономик'],
+  'Medicine': ['medicine', 'medical', 'health', 'nursing', 'pharmacy', 'медицин', 'здоров', 'фармац', 'врач'],
+  'Arts': ['art', 'design', 'music', 'theater', 'film', 'creative', 'искусств', 'дизайн', 'музык', 'театр', 'кино'],
+  'Engineering': ['mechanical', 'electrical', 'civil', 'aerospace', 'industrial', 'механик', 'электр', 'строител', 'промышлен'],
+  'Law': ['law', 'legal', 'jurisprudence', 'право', 'юрид', 'юриспруд'],
+  'Humanities': ['history', 'philosophy', 'literature', 'linguistics', 'psychology', 'история', 'философ', 'литератур', 'лингвист', 'психолог'],
+  'Social Sciences': ['sociology', 'political', 'international', 'social', 'социолог', 'политолог', 'международн'],
+  'Education': ['education', 'teaching', 'pedagogy', 'образован', 'педагог', 'учител'],
+  'Agriculture': ['agriculture', 'farming', 'agronomy', 'сельско', 'агро', 'фермер'],
+};
+
+/**
+ * Извлечь специализации университета из программ
+ * @param university - профиль университета
+ * @returns массив категорий специализаций
+ */
+export const extractSpecializations = (university: Partial<University>): string[] => {
+  const specializations = new Set<string>();
+  const programs = university.programs || [];
+
+  // Собрать весь текст для анализа
+  const textToAnalyze = [
+    university.description || '',
+    university.mission || '',
+    ...programs.map((p) => `${p.name} ${p.description || ''}`),
+  ].join(' ').toLowerCase();
+
+  // Проверить каждую категорию
+  for (const [category, keywords] of Object.entries(SPECIALIZATION_KEYWORDS)) {
+    for (const keyword of keywords) {
+      if (textToAnalyze.includes(keyword.toLowerCase())) {
+        specializations.add(category);
+        break;
+      }
+    }
+  }
+
+  return Array.from(specializations);
+};
+
+/**
+ * Результат извлечения диапазона стоимости
+ */
+interface TuitionRange {
+  min: number | null;
+  max: number | null;
+}
+
+/**
+ * Извлечь диапазон стоимости обучения
+ * @param university - профиль университета
+ * @returns минимальная и максимальная стоимость
+ */
+export const extractTuitionRange = (university: Partial<University>): TuitionRange => {
+  const programs = university.programs || [];
+  const amounts: number[] = [];
+
+  // Собрать все суммы из программ
+  for (const program of programs) {
+    if (program.tuition?.amount && typeof program.tuition.amount === 'number') {
+      amounts.push(program.tuition.amount);
+    }
+  }
+
+  // Проверить общие данные о стоимости
+  const generalTuition = university.tuition_general;
+  if (generalTuition) {
+    const parseAmount = (str: string | undefined): number | null => {
+      if (!str) return null;
+      const match = str.match(/[\d,]+/);
+      if (match) {
+        return parseInt(match[0].replace(/,/g, ''), 10);
+      }
+      return null;
+    };
+
+    const intAmount = parseAmount(generalTuition.international_students);
+    const domAmount = parseAmount(generalTuition.domestic_students);
+    
+    if (intAmount) amounts.push(intAmount);
+    if (domAmount) amounts.push(domAmount);
+  }
+
+  if (amounts.length === 0) {
+    return { min: null, max: null };
+  }
+
+  return {
+    min: Math.min(...amounts),
+    max: Math.max(...amounts),
+  };
+};
+
+/**
+ * Определить категорию размера университета
+ * @param university - профиль университета
+ * @returns категория размера: small, medium, large
+ */
+export const determineUniversitySize = (
+  university: Partial<University>
+): 'small' | 'medium' | 'large' | null => {
+  const studentCount = university.student_count;
+
+  if (!studentCount || studentCount <= 0) {
+    return null;
+  }
+
+  if (studentCount < 5000) {
+    return 'small';
+  }
+  if (studentCount <= 20000) {
+    return 'medium';
+  }
+  return 'large';
+};
+
+/**
+ * Извлечь уникальные языки обучения из программ
+ * @param university - профиль университета
+ * @returns массив языков
+ */
+export const extractLanguages = (university: Partial<University>): string[] => {
+  const languages = new Set<string>();
+  const programs = university.programs || [];
+
+  for (const program of programs) {
+    if (program.language && program.language !== NO_INFO) {
+      languages.add(program.language);
+    }
+  }
+
+  // Проверить international данные
+  const intlLanguages = university.international?.languages_of_instruction;
+  if (Array.isArray(intlLanguages)) {
+    for (const lang of intlLanguages) {
+      if (lang && lang !== NO_INFO) {
+        languages.add(lang);
+      }
+    }
+  }
+
+  return Array.from(languages);
+};
+
+/**
+ * Извлечь уникальные уровни образования из программ
+ * @param university - профиль университета
+ * @returns массив уровней (Bachelor, Master, PhD)
+ */
+export const extractDegreeLevels = (university: Partial<University>): string[] => {
+  const levels = new Set<string>();
+  const programs = university.programs || [];
+
+  for (const program of programs) {
+    if (program.degree_level) {
+      levels.add(program.degree_level);
+    }
+  }
+
+  return Array.from(levels);
+};
+
+/**
+ * Подготовить данные для расширенных колонок БД
+ * @param university - профиль университета
+ * @returns объект с данными для новых колонок
+ */
+export const prepareExtendedDbFields = (university: Partial<University>) => {
+  const tuitionRange = extractTuitionRange(university);
+  
+  return {
+    specializations: JSON.stringify(extractSpecializations(university)),
+    languages: JSON.stringify(extractLanguages(university)),
+    degree_levels: JSON.stringify(extractDegreeLevels(university)),
+    min_tuition: tuitionRange.min,
+    max_tuition: tuitionRange.max,
+    size_category: determineUniversitySize(university),
+    rankings: JSON.stringify(university.rankings || []),
+    accepts_international: university.international?.accepts_international ?? true,
+    founded_year: university.founded_year || null,
+    student_count: university.student_count || null,
+  };
+};
+
+/**
  * Удалить все профили университета и создать заново с нуля
  * @param universityId - ID университета
  * @param sourceId - ID источника
@@ -563,10 +903,36 @@ export const resetAndReparseUniversity = async (
         [hash, sourceId]
       );
 
-      // Обновить университет
+      // Обновить университет с расширенными полями
+      const extendedFields = prepareExtendedDbFields(fullProfile);
       await client.queryObject(
-        `UPDATE universities SET updated_at = NOW() WHERE id = $1`,
-        [universityId]
+        `UPDATE universities SET 
+          updated_at = NOW(),
+          specializations = $2,
+          languages = $3,
+          degree_levels = $4,
+          min_tuition = $5,
+          max_tuition = $6,
+          size_category = $7,
+          rankings = $8,
+          accepts_international = $9,
+          founded_year = $10,
+          student_count = $11,
+          indexed_at = NOW()
+        WHERE id = $1`,
+        [
+          universityId,
+          extendedFields.specializations,
+          extendedFields.languages,
+          extendedFields.degree_levels,
+          extendedFields.min_tuition,
+          extendedFields.max_tuition,
+          extendedFields.size_category,
+          extendedFields.rankings,
+          extendedFields.accepts_international,
+          extendedFields.founded_year,
+          extendedFields.student_count,
+        ]
       );
     });
 
@@ -743,10 +1109,36 @@ export const checkAndUpdateWebsite = async (
         [hash, sourceId]
       );
 
-      // Обновить университет
+      // Обновить университет с расширенными полями
+      const extendedFields = prepareExtendedDbFields(fullProfile);
       await client.queryObject(
-        `UPDATE universities SET updated_at = NOW() WHERE id = $1`,
-        [universityId]
+        `UPDATE universities SET 
+          updated_at = NOW(),
+          specializations = $2,
+          languages = $3,
+          degree_levels = $4,
+          min_tuition = $5,
+          max_tuition = $6,
+          size_category = $7,
+          rankings = $8,
+          accepts_international = $9,
+          founded_year = $10,
+          student_count = $11,
+          indexed_at = NOW()
+        WHERE id = $1`,
+        [
+          universityId,
+          extendedFields.specializations,
+          extendedFields.languages,
+          extendedFields.degree_levels,
+          extendedFields.min_tuition,
+          extendedFields.max_tuition,
+          extendedFields.size_category,
+          extendedFields.rankings,
+          extendedFields.accepts_international,
+          extendedFields.founded_year,
+          extendedFields.student_count,
+        ]
       );
     });
 

@@ -37,57 +37,104 @@ interface PaginatedResult<T> {
 }
 
 /**
+ * Расширенная строка университета с данными из профиля
+ */
+export interface UniversityRowExtended extends UniversityRow {
+  programs_count: number;
+  completeness: number;
+  ranking_world: number | null;
+  tuition_min: number | null;
+  tuition_max: number | null;
+}
+
+/**
  * Получить список университетов
  * @param params - параметры пагинации и поиска
  * @returns список университетов с пагинацией
  */
 export const getAllUniversities = async (
   params: SearchParams = {}
-): Promise<PaginatedResult<UniversityRow>> => {
+): Promise<PaginatedResult<UniversityRowExtended>> => {
   const { limit = 20, offset = 0, search, country, city } = params;
 
   logger.debug('Fetching universities', { limit, offset, search, country, city });
 
   try {
     // Базовый запрос
-    let whereClause = 'WHERE is_active = true';
+    let whereClause = 'WHERE u.is_active = true';
     const queryParams: unknown[] = [];
     let paramIndex = 1;
 
     // Добавить фильтр поиска
     if (search) {
-      whereClause += ` AND (name ILIKE $${paramIndex} OR name_en ILIKE $${paramIndex})`;
+      whereClause += ` AND (u.name ILIKE $${paramIndex} OR u.name_en ILIKE $${paramIndex})`;
       queryParams.push(`%${search}%`);
       paramIndex++;
     }
 
     // Фильтр по стране
     if (country) {
-      whereClause += ` AND country = $${paramIndex}`;
+      whereClause += ` AND u.country = $${paramIndex}`;
       queryParams.push(country);
       paramIndex++;
     }
 
     // Фильтр по городу
     if (city) {
-      whereClause += ` AND city = $${paramIndex}`;
+      whereClause += ` AND u.city = $${paramIndex}`;
       queryParams.push(city);
       paramIndex++;
     }
 
     // Получить общее количество
     const countResult = await query<{ count: string }>(
-      `SELECT COUNT(*) as count FROM universities ${whereClause}`,
+      `SELECT COUNT(*) as count FROM universities u ${whereClause}`,
       queryParams
     );
     const total = parseInt(countResult[0]?.count ?? '0', 10);
 
-    // Получить данные с пагинацией
-    const data = await query<UniversityRow>(
-      `SELECT id, name, name_en, country, city, website_url, logo_url, is_active, created_at, updated_at
-       FROM universities
+    // Получить данные с пагинацией и данными из профиля
+    const data = await query<UniversityRowExtended>(
+      `SELECT 
+        u.id, 
+        u.name, 
+        u.name_en, 
+        u.country, 
+        u.city, 
+        u.website_url, 
+        u.logo_url, 
+        u.is_active, 
+        u.created_at, 
+        u.updated_at,
+        COALESCE(jsonb_array_length(p.profile_json->'programs'), 0)::int as programs_count,
+        COALESCE((p.profile_json->'metadata'->>'completeness_score')::int, 0) as completeness,
+        (
+          SELECT MIN((r->>'rank')::int)
+          FROM jsonb_array_elements(
+            COALESCE(p.profile_json->'rankings', p.profile_json->'ratings', '[]'::jsonb)
+          ) as r
+          WHERE r->>'source' ILIKE '%QS World%' OR r->>'source' ILIKE '%QS%World%'
+        ) as ranking_world,
+        (
+          SELECT MIN((prog->'tuition'->>'amount')::numeric)::int
+          FROM jsonb_array_elements(COALESCE(p.profile_json->'programs', '[]'::jsonb)) as prog
+          WHERE (prog->'tuition'->>'amount') IS NOT NULL AND (prog->'tuition'->>'amount')::numeric > 0
+        ) as tuition_min,
+        (
+          SELECT MAX((prog->'tuition'->>'amount')::numeric)::int
+          FROM jsonb_array_elements(COALESCE(p.profile_json->'programs', '[]'::jsonb)) as prog
+          WHERE (prog->'tuition'->>'amount') IS NOT NULL
+        ) as tuition_max
+       FROM universities u
+       LEFT JOIN LATERAL (
+         SELECT profile_json 
+         FROM university_profiles 
+         WHERE university_id = u.id 
+         ORDER BY version DESC, created_at DESC 
+         LIMIT 1
+       ) p ON true
        ${whereClause}
-       ORDER BY name ASC
+       ORDER BY u.name ASC
        LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
       [...queryParams, limit, offset]
     );

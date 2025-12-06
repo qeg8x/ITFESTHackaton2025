@@ -11,6 +11,7 @@ export {
   logUpdateAttempt,
   getCountries,
   getCities,
+  type UniversityRowExtended,
 } from './universities.service.ts';
 
 export {

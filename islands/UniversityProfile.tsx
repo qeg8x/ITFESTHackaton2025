@@ -4,6 +4,7 @@ import type { University } from '../src/types/university.ts';
 import { ProgramsList } from '../components/ProgramsList.tsx';
 import { ProfileSkeleton } from '../components/Loading.tsx';
 import { ErrorMessage } from '../components/ErrorMessage.tsx';
+import { UniversityMapStatic } from '../src/components/UniversityMap.tsx';
 
 /**
  * Props для профиля университета
@@ -262,6 +263,18 @@ export default function UniversityProfile({
               </div>
             )}
           </div>
+        </section>
+      )}
+
+      {/* Map */}
+      {p.latitude && p.longitude && (
+        <section class="bg-white rounded-xl shadow-sm p-6">
+          <UniversityMapStatic
+            latitude={p.latitude}
+            longitude={p.longitude}
+            name={p.name}
+            address={p.contacts?.address}
+          />
         </section>
       )}
 

@@ -1,12 +1,34 @@
 /**
  * Сервис поиска и проверки существования университетов
+ * Включает autocomplete функциональность
  */
 
 import { logger } from '../utils/logger.ts';
 import { callOllamaForJson } from '../utils/ollama.client.ts';
-import { queryOne, transaction } from '../config/database.ts';
+import { query, queryOne, transaction } from '../config/database.ts';
 import { NO_INFO, type University } from '../types/university.ts';
 import type { PoolClient } from 'postgres';
+
+/**
+ * Результат автодополнения
+ */
+export interface AutocompleteResult {
+  id?: string;
+  name: string;
+  country: string;
+  found_in_db: boolean;
+  source: 'db' | 'ollama';
+}
+
+/**
+ * Ответ autocomplete API
+ */
+export interface AutocompleteResponse {
+  results: AutocompleteResult[];
+  query: string;
+  total: number;
+  cache_hit: boolean;
+}
 
 /**
  * Программа из результата поиска
@@ -104,6 +126,19 @@ export interface SearchResult {
  */
 const searchCache = new Map<string, { result: UniversitySearchResult; timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 30; // 30 минут
+
+/**
+ * Кэш результатов autocomplete
+ */
+const autocompleteCache = new Map<string, { results: AutocompleteResult[]; timestamp: number }>();
+const AUTOCOMPLETE_CACHE_TTL = 1000 * 60 * 60; // 1 час
+
+/**
+ * Rate limiter для autocomplete (по IP)
+ */
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 минута
 
 /**
  * Очистить кэш поиска
@@ -603,4 +638,238 @@ export const findOrCreateUniversity = async (
     created: false, 
     error: searchResult.error || 'Cannot create university: not confirmed by AI' 
   };
+};
+
+/**
+ * Проверить rate limit для IP
+ * @param ip - IP адрес клиента
+ * @returns true если лимит не превышен
+ */
+export const checkRateLimit = (ip: string): boolean => {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
+};
+
+/**
+ * Поиск университетов в БД для autocomplete
+ * @param searchQuery - строка поиска
+ * @returns массив результатов из БД
+ */
+const searchDatabaseForAutocomplete = async (
+  searchQuery: string
+): Promise<AutocompleteResult[]> => {
+  const startTime = Date.now();
+  
+  try {
+    const results = await query<{ id: string; name: string; country: string }>(
+      `SELECT id, name, country
+       FROM universities
+       WHERE name ILIKE '%' || $1 || '%'
+          OR name_en ILIKE '%' || $1 || '%'
+       ORDER BY 
+         CASE WHEN name ILIKE $1 || '%' THEN 0 ELSE 1 END,
+         name
+       LIMIT 10`,
+      [searchQuery]
+    );
+
+    const duration = Date.now() - startTime;
+    if (duration > 500) {
+      logger.warn('Slow autocomplete DB query', { query: searchQuery, duration });
+    }
+
+    return results.map((row) => ({
+      id: row.id,
+      name: row.name,
+      country: row.country,
+      found_in_db: true,
+      source: 'db' as const,
+    }));
+  } catch (err) {
+    logger.error('Autocomplete DB search failed', { error: err });
+    return [];
+  }
+};
+
+/**
+ * Результат поиска через Ollama для autocomplete
+ */
+interface OllamaAutocompleteResult {
+  name: string;
+  country: string;
+  exists_in_our_db: boolean;
+}
+
+/**
+ * Поиск университетов через Ollama для autocomplete
+ * @param searchQuery - строка поиска
+ * @param existingNames - имена уже найденных университетов (для дедупликации)
+ * @returns массив результатов от AI
+ */
+const searchOllamaForAutocomplete = async (
+  searchQuery: string,
+  existingNames: Set<string>
+): Promise<AutocompleteResult[]> => {
+  const startTime = Date.now();
+  
+  const prompt = `You are a university database assistant.
+Search for universities where name contains: "${searchQuery}"
+Return top 5 real universities with: name, country, exists_in_our_db (always false for new universities)
+Return ONLY a valid JSON array, no explanations.
+Example: [{"name": "Harvard University", "country": "USA", "exists_in_our_db": false}]`;
+
+  try {
+    const results = await callOllamaForJson<OllamaAutocompleteResult[]>(prompt);
+
+    const duration = Date.now() - startTime;
+    if (duration > 500) {
+      logger.warn('Slow autocomplete Ollama query', { query: searchQuery, duration });
+    }
+
+    if (!Array.isArray(results)) {
+      return [];
+    }
+
+    // Фильтруем дубликаты и форматируем результаты
+    return results
+      .filter((r) => r.name && !existingNames.has(r.name.toLowerCase()))
+      .slice(0, 5)
+      .map((r) => ({
+        name: r.name,
+        country: r.country || 'Unknown',
+        found_in_db: false,
+        source: 'ollama' as const,
+      }));
+  } catch (err) {
+    logger.error('Autocomplete Ollama search failed', { error: err });
+    return [];
+  }
+};
+
+/**
+ * Поиск университетов с автодополнением
+ * Параллельно ищет в БД и через Ollama
+ * @param searchQuery - строка поиска (минимум 2 символа)
+ * @param ip - IP для rate limiting (опционально)
+ * @returns результаты autocomplete
+ */
+export const searchUniversitiesAutocomplete = async (
+  searchQuery: string,
+  ip?: string
+): Promise<AutocompleteResponse> => {
+  const startTime = Date.now();
+  const normalizedQuery = normalizeSearchQuery(searchQuery);
+
+  // Валидация
+  if (normalizedQuery.length < 2) {
+    return { results: [], query: searchQuery, total: 0, cache_hit: false };
+  }
+
+  // Проверить rate limit
+  if (ip && !checkRateLimit(ip)) {
+    logger.warn('Autocomplete rate limit exceeded', { ip });
+    throw new Error('Rate limit exceeded. Please wait before making more requests.');
+  }
+
+  // Проверить кэш
+  const cached = autocompleteCache.get(normalizedQuery);
+  if (cached && Date.now() - cached.timestamp < AUTOCOMPLETE_CACHE_TTL) {
+    logger.debug('Autocomplete cache hit', { query: normalizedQuery });
+    return {
+      results: cached.results,
+      query: searchQuery,
+      total: cached.results.length,
+      cache_hit: true,
+    };
+  }
+
+  logger.info('Autocomplete search', { query: searchQuery });
+
+  // Параллельный поиск в БД и Ollama
+  const dbPromise = searchDatabaseForAutocomplete(normalizedQuery);
+  
+  // Запускаем Ollama поиск параллельно, но с таймаутом
+  const ollamaPromise = Promise.race([
+    (async () => {
+      const dbResults = await dbPromise;
+      const existingNames = new Set(dbResults.map((r) => r.name.toLowerCase()));
+      return searchOllamaForAutocomplete(normalizedQuery, existingNames);
+    })(),
+    new Promise<AutocompleteResult[]>((resolve) => 
+      setTimeout(() => resolve([]), 2000) // 2 секунды таймаут для Ollama
+    ),
+  ]);
+
+  const [dbResults, ollamaResults] = await Promise.all([dbPromise, ollamaPromise]);
+
+  // Объединить и дедуплицировать результаты
+  const seenNames = new Set<string>();
+  const allResults: AutocompleteResult[] = [];
+
+  // Сначала результаты из БД (приоритет)
+  for (const result of dbResults) {
+    const key = result.name.toLowerCase();
+    if (!seenNames.has(key)) {
+      seenNames.add(key);
+      allResults.push(result);
+    }
+  }
+
+  // Затем результаты от Ollama
+  for (const result of ollamaResults) {
+    const key = result.name.toLowerCase();
+    if (!seenNames.has(key) && allResults.length < 10) {
+      seenNames.add(key);
+      allResults.push(result);
+    }
+  }
+
+  // Ограничить до 10 результатов
+  const finalResults = allResults.slice(0, 10);
+
+  // Сохранить в кэш
+  autocompleteCache.set(normalizedQuery, {
+    results: finalResults,
+    timestamp: Date.now(),
+  });
+
+  const duration = Date.now() - startTime;
+  logger.info('Autocomplete completed', {
+    query: searchQuery,
+    dbCount: dbResults.length,
+    ollamaCount: ollamaResults.length,
+    totalCount: finalResults.length,
+    duration,
+  });
+
+  if (duration > 500) {
+    logger.warn('Slow autocomplete response', { query: searchQuery, duration });
+  }
+
+  return {
+    results: finalResults,
+    query: searchQuery,
+    total: finalResults.length,
+    cache_hit: false,
+  };
+};
+
+/**
+ * Очистить кэш autocomplete
+ */
+export const clearAutocompleteCache = (): void => {
+  autocompleteCache.clear();
+  logger.debug('Autocomplete cache cleared');
 };

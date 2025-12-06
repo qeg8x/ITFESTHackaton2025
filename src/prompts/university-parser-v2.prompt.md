@@ -11,6 +11,48 @@ CRITICAL RULES:
 7. Do NOT invent information - only extract what's on the website
 8. Return ONLY valid JSON, no additional text
 
+SPECIAL EXTRACTION RULES:
+
+LEADERSHIP:
+- Extract names and titles of top administrators
+- Include: Rector, President, Vice Presidents, Deans
+- Format: "Name, Title"
+- If not found: "Нет информации"
+
+ACHIEVEMENTS:
+- Extract major achievements and recognition
+- Include: rankings, awards, certifications, accreditations
+- Include year if available
+- Format: bullet points or comma-separated
+- If not found: "Нет информации"
+
+RESEARCH FOCUS:
+- What research areas is university known for?
+- Include: research centers, institutes, labs
+- Format: comma-separated list
+- If not found: "Нет информации"
+
+SPECIAL PROGRAMS:
+- Any special or unique programs (honors, accelerated, dual-degree, etc)
+- Format: bullet points
+- If not found: "Нет информации"
+
+NOTABLE ALUMNI:
+- Famous alumni who studied there
+- Include: name, achievement/profession
+- Format: "Name - Achievement"
+- If not found: "Нет информации"
+
+COORDINATES:
+- Extract main campus coordinates (latitude, longitude)
+- Look for address and determine approximate coordinates
+- For Kazakhstan universities, use known coordinates:
+  - Almaty: lat ~43.24, lng ~76.95
+  - Astana/Nur-Sultan: lat ~51.16, lng ~71.47
+  - Other cities: estimate from city center
+- Format: {"latitude": 43.2389, "longitude": 76.9451}
+- If completely unknown: null for both
+
 Return JSON in this EXACT structure:
 ```json
 {
@@ -108,6 +150,15 @@ Return JSON in this EXACT structure:
     "visa_support": "string or 'Нет информации'",
     "exchange_programs": "string or 'Нет информации'",
     "languages_of_instruction": ["array of strings or 'Нет информации'"]
+  },
+  
+  "leadership": "string (Rector/President name and title, or 'Нет информации')",
+  "achievements": "string (major achievements, awards, rankings, or 'Нет информации')",
+  
+  "coordinates": {
+    "latitude": "number or null (e.g., 43.2389)",
+    "longitude": "number or null (e.g., 76.9451)",
+    "campus_location": "string (description of campus location, or 'Нет информации')"
   },
   
   "other": {
@@ -229,4 +280,71 @@ IMPORTANT REMINDERS:
 - If a field is genuinely not available, use "Нет информации" or null
 - Return ONLY raw JSON - no markdown code blocks, no explanations
 
-NOW: Extract information from the provided university website text and return ONLY the JSON.
+---
+
+## MULTILINGUAL TRANSLATIONS (CRITICAL)
+
+You MUST also translate the extracted information into THREE languages:
+- **Russian (ru)** - Русский язык
+- **Kazakh (kk)** - Қазақ тілі  
+- **English (en)** - English
+
+Add a `translations` field to your JSON output with this structure:
+
+```json
+{
+  "name": "original name",
+  "description": "original description",
+  "programs": [...],
+  
+  "translations": {
+    "ru": {
+      "name": "название на русском",
+      "description": "описание на русском",
+      "mission": "миссия на русском",
+      "programs": [
+        { "name": "программа на русском", "description": "описание на русском" }
+      ]
+    },
+    "kk": {
+      "name": "атауы қазақша",
+      "description": "сипаттама қазақша",
+      "mission": "миссия қазақша",
+      "programs": [
+        { "name": "бағдарлама қазақша", "description": "сипаттама қазақша" }
+      ]
+    },
+    "en": {
+      "name": "name in English",
+      "description": "description in English",
+      "mission": "mission in English",
+      "programs": [
+        { "name": "program in English", "description": "description in English" }
+      ]
+    }
+  },
+  
+  ... other fields ...
+}
+```
+
+### TRANSLATION REQUIREMENTS:
+
+1. **Professional Quality** - Translations must be professional, not machine-translated quality
+2. **Educational Terminology** - Use correct educational terminology for each language
+3. **Context Preservation** - Preserve the meaning and context, don't translate literally
+4. **Program Names**:
+   - "Computer Science" → RU: "Информатика", KK: "Информатика", EN: "Computer Science"
+   - "Business Administration" → RU: "Бизнес-администрирование", KK: "Бизнес әкімшілігі", EN: "Business Administration"
+5. **If you cannot translate** - use the original text rather than leaving empty
+6. **ALL THREE LANGUAGES ARE REQUIRED** - ru, kk, en must all be present
+
+### LANGUAGE STANDARDS:
+
+- **Russian (ru)**: Standard Russian educational language
+- **Kazakh (kk)**: Standard Kazakh educational language (Cyrillic script)
+- **English (en)**: International English
+
+---
+
+NOW: Extract information from the provided university website text, translate to all three languages, and return ONLY the JSON.
