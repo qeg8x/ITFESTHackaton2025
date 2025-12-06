@@ -4,21 +4,22 @@
  */
 
 import { useCallback, useEffect, useRef } from 'preact/hooks';
+import { useLanguage } from '../contexts/LanguageContext.tsx';
 
 export type TabId = 'search' | 'base' | 'battle' | 'chat' | 'admin';
 
 export interface TabItem {
   id: TabId;
-  label: string;
+  labelKey: string;
   icon: string;
 }
 
-export const TABS: TabItem[] = [
-  { id: 'search', label: 'Умный поиск', icon: '🔍' },
-  { id: 'base', label: 'База', icon: '📚' },
-  { id: 'battle', label: 'Батл', icon: '⚔️' },
-  { id: 'chat', label: 'Чат', icon: '💬' },
-  { id: 'admin', label: 'Админ', icon: '⚙️' },
+export const TAB_ITEMS: TabItem[] = [
+  { id: 'search', labelKey: 'tabs.smartSearch', icon: '🔍' },
+  { id: 'base', labelKey: 'tabs.base', icon: '📚' },
+  { id: 'battle', labelKey: 'tabs.battle', icon: '⚔️' },
+  { id: 'chat', labelKey: 'tabs.chat', icon: '💬' },
+  { id: 'admin', labelKey: 'tabs.admin', icon: '⚙️' },
 ];
 
 interface TabsProps {
@@ -42,19 +43,20 @@ export const Tabs = ({
   onMobileMenuToggle,
 }: TabsProps) => {
   const tabsRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+      const currentIndex = TAB_ITEMS.findIndex((tab) => tab.id === activeTab);
       
       if (e.key === 'ArrowRight') {
         e.preventDefault();
-        const nextIndex = (currentIndex + 1) % TABS.length;
-        onTabChange(TABS[nextIndex].id);
+        const nextIndex = (currentIndex + 1) % TAB_ITEMS.length;
+        onTabChange(TAB_ITEMS[nextIndex].id);
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        const prevIndex = currentIndex === 0 ? TABS.length - 1 : currentIndex - 1;
-        onTabChange(TABS[prevIndex].id);
+        const prevIndex = currentIndex === 0 ? TAB_ITEMS.length - 1 : currentIndex - 1;
+        onTabChange(TAB_ITEMS[prevIndex].id);
       }
     },
     [activeTab, onTabChange]
@@ -73,14 +75,15 @@ export const Tabs = ({
       {/* Desktop Tabs */}
       <nav
         ref={tabsRef}
-        class="hidden md:flex items-center justify-center gap-1 bg-white border-b border-gray-200 px-4"
+        class="hidden md:flex items-center bg-white border-b border-gray-200"
         role="tablist"
         tabIndex={0}
       >
-        {TABS.map((tab) => (
+        {TAB_ITEMS.map((tab) => (
           <TabButton
             key={tab.id}
             tab={tab}
+            label={t(tab.labelKey)}
             isActive={activeTab === tab.id}
             onClick={() => onTabChange(tab.id)}
           />
@@ -90,8 +93,8 @@ export const Tabs = ({
       {/* Mobile Menu Button */}
       <div class="md:hidden flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
         <span class="font-medium text-gray-900">
-          {TABS.find((t) => t.id === activeTab)?.icon}{' '}
-          {TABS.find((t) => t.id === activeTab)?.label}
+          {TAB_ITEMS.find((tab) => tab.id === activeTab)?.icon}{' '}
+          {t(TAB_ITEMS.find((tab) => tab.id === activeTab)?.labelKey || '')}
         </span>
         <button
           type="button"
@@ -125,7 +128,7 @@ export const Tabs = ({
         }`}
       >
         <nav class="bg-white border-b border-gray-200 py-2 px-4 space-y-1">
-          {TABS.map((tab) => (
+          {TAB_ITEMS.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -140,7 +143,7 @@ export const Tabs = ({
               }`}
             >
               <span class="text-xl">{tab.icon}</span>
-              <span class="font-medium">{tab.label}</span>
+              <span class="font-medium">{t(tab.labelKey)}</span>
             </button>
           ))}
         </nav>
@@ -151,6 +154,7 @@ export const Tabs = ({
 
 interface TabButtonProps {
   tab: TabItem;
+  label: string;
   isActive: boolean;
   onClick: () => void;
 }
@@ -158,20 +162,20 @@ interface TabButtonProps {
 /**
  * Отдельная кнопка таба
  */
-const TabButton = ({ tab, isActive, onClick }: TabButtonProps) => (
+const TabButton = ({ tab, label, isActive, onClick }: TabButtonProps) => (
   <button
     type="button"
     role="tab"
     aria-selected={isActive}
     onClick={onClick}
-    class={`relative flex items-center gap-2 px-4 py-4 font-medium transition-all duration-200 ${
+    class={`relative flex-1 flex items-center justify-center gap-2 px-4 py-4 font-medium transition-all duration-200 border-r border-gray-100 last:border-r-0 ${
       isActive
-        ? 'text-blue-600'
-        : 'text-gray-500 hover:text-gray-700'
+        ? 'text-blue-600 bg-blue-50/50'
+        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
     }`}
   >
     <span class="text-lg">{tab.icon}</span>
-    <span>{tab.label}</span>
+    <span>{label}</span>
     {/* Active indicator */}
     <span
       class={`absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 transition-all duration-300 ${

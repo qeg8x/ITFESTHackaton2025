@@ -4,6 +4,7 @@
 
 import type { ComponentChildren } from 'preact';
 import { Tabs, type TabId } from './Tabs.tsx';
+import { LanguageSwitcher, useLanguage } from '../contexts/LanguageContext.tsx';
 
 interface MainLayoutProps {
   activeTab: TabId;
@@ -28,6 +29,8 @@ export const MainLayout = ({
   onMobileMenuToggle,
   children,
 }: MainLayoutProps) => {
+  const { t } = useLanguage();
+
   return (
     <div class="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -37,18 +40,12 @@ export const MainLayout = ({
             {/* Logo */}
             <a href="/" class="flex items-center gap-2 group">
               <span class="text-2xl group-hover:scale-110 transition-transform">🎓</span>
-              <span class="font-bold text-xl text-gray-900">Цифровой университет</span>
+              <span class="font-bold text-xl text-gray-900">{t('common.appTitle')}</span>
             </a>
             
-            {/* Language Selector (placeholder) */}
+            {/* Language Selector */}
             <div class="flex items-center gap-4">
-              <button
-                type="button"
-                class="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <span>🌐</span>
-                <span class="hidden sm:inline">RU</span>
-              </button>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -71,9 +68,9 @@ export const MainLayout = ({
           <div class="flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-gray-500">
             <div class="flex items-center gap-2">
               <span>🎓</span>
-              <span>Цифровой университет © 2025</span>
+              <span>{t('footer.copyright')}</span>
             </div>
-            <p>Данные обновляются автоматически с помощью AI</p>
+            <p>{t('footer.dataUpdated')}</p>
           </div>
         </div>
       </footer>

@@ -5,6 +5,7 @@
 
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 interface University {
   id: string;
@@ -29,6 +30,7 @@ interface ComparisonResult {
  * Tab контейнер для сравнения (батла) университетов
  */
 export const BattleTab = () => {
+  const { t, language } = useLanguage();
   const universities = useSignal<University[]>([]);
   const loading = useSignal(true);
   const uni1 = useSignal<University | null>(null);
@@ -112,10 +114,10 @@ export const BattleTab = () => {
       {/* Header */}
       <div class="py-8 px-4 text-center">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-          ⚔️ Батл университетов
+          ⚔️ {t('battle.title')}
         </h1>
         <p class="text-gray-600">
-          Выберите два университета для сравнения
+          {t('battle.subtitle')}
         </p>
       </div>
 
@@ -125,7 +127,10 @@ export const BattleTab = () => {
           <div class="grid md:grid-cols-2 gap-6">
             {/* University 1 Selector */}
             <UniversitySelector
-              label="Первый университет"
+              label={t('battle.selectFirst')}
+              searchPlaceholder={t('battle.searchPlaceholder')}
+              programsLabel={t('university.programsCount')}
+              dataLabel={t('filters.activeFilters')}
               selected={uni1.value}
               searchQuery={searchQuery1.value}
               onSearchChange={(q) => { searchQuery1.value = q; }}
@@ -141,7 +146,10 @@ export const BattleTab = () => {
 
             {/* University 2 Selector */}
             <UniversitySelector
-              label="Второй университет"
+              label={t('battle.selectSecond')}
+              searchPlaceholder={t('battle.searchPlaceholder')}
+              programsLabel={t('university.programsCount')}
+              dataLabel={t('filters.activeFilters')}
               selected={uni2.value}
               searchQuery={searchQuery2.value}
               onSearchChange={(q) => { searchQuery2.value = q; }}
@@ -166,14 +174,14 @@ export const BattleTab = () => {
                   aiComparing.value = true;
                   try {
                     const response = await fetch(
-                      `/api/universities/compare?id1=${uni1.value.id}&id2=${uni2.value.id}&language=ru`
+                      `/api/universities/compare?id1=${uni1.value.id}&id2=${uni2.value.id}&language=${language.value}`
                     );
                     const data = await response.json();
                     if (data.success && data.result) {
                       aiResult.value = {
                         winner: data.result.overallWinner === 'A' ? uni1.value.name 
                                : data.result.overallWinner === 'B' ? uni2.value.name 
-                               : 'Ничья',
+                               : t('battle.tie'),
                         recommendation: data.result.recommendation || '',
                       };
                     }
@@ -189,10 +197,10 @@ export const BattleTab = () => {
                 {aiComparing.value ? (
                   <span class="flex items-center gap-2">
                     <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    AI анализирует...
+                    {t('common.loading')}
                   </span>
                 ) : (
-                  '🤖 AI сравнение'
+                  `🤖 ${t('battle.compare')}`
                 )}
               </button>
             </div>
@@ -217,7 +225,7 @@ export const BattleTab = () => {
           {uni1.value && uni2.value && (
             <div class="mt-8 bg-white rounded-2xl border border-gray-200 overflow-hidden">
               <div class="bg-gradient-to-r from-blue-600 to-red-600 text-white text-center py-4">
-                <h2 class="text-lg font-semibold">Результаты сравнения</h2>
+                <h2 class="text-lg font-semibold">{t('battle.results')}</h2>
               </div>
               <div class="divide-y divide-gray-100">
                 {comparisons.map((comp) => (
@@ -253,7 +261,7 @@ export const BattleTab = () => {
             <div class="mt-8 text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
               <span class="text-4xl">⚔️</span>
               <p class="mt-4 text-gray-500">
-                Выберите два университета для начала батла
+                {t('battle.selectBoth')}
               </p>
             </div>
           )}
@@ -265,6 +273,9 @@ export const BattleTab = () => {
 
 interface UniversitySelectorProps {
   label: string;
+  searchPlaceholder: string;
+  programsLabel: string;
+  dataLabel: string;
   selected: University | null;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -279,6 +290,9 @@ interface UniversitySelectorProps {
  */
 const UniversitySelector = ({
   label,
+  searchPlaceholder,
+  programsLabel,
+  dataLabel,
   selected,
   searchQuery,
   onSearchChange,
@@ -309,8 +323,8 @@ const UniversitySelector = ({
           </button>
         </div>
         <div class="mt-4 flex gap-4 text-sm">
-          <span class="text-gray-500">{selected.programs_count} программ</span>
-          <span class="text-gray-500">{selected.completeness}% данных</span>
+          <span class="text-gray-500">{selected.programs_count} {programsLabel}</span>
+          <span class="text-gray-500">{selected.completeness}% {dataLabel}</span>
         </div>
       </div>
     );
@@ -321,7 +335,7 @@ const UniversitySelector = ({
       <p class="text-sm font-medium text-gray-700 mb-3">{label}</p>
       <input
         type="text"
-        placeholder="Поиск университета..."
+        placeholder={searchPlaceholder}
         value={searchQuery}
         onInput={(e) => onSearchChange((e.target as HTMLInputElement).value)}
         class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"

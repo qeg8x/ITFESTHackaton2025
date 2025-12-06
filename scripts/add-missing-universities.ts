@@ -24,6 +24,7 @@ const MISSING_UNIVERSITIES = [
       country: 'Казахстан',
       city: 'Алматы',
       website_url: 'https://almau.edu.kz/',
+      logo_url: 'https://almau.edu.kz/wp-content/uploads/2023/01/logo.png',
       latitude: 43.2270,
       longitude: 76.9430,
     },
@@ -132,6 +133,7 @@ const MISSING_UNIVERSITIES = [
       country: 'Казахстан',
       city: 'Шымкент',
       website_url: 'https://auezov.edu.kz/',
+      logo_url: 'https://auezov.edu.kz/images/logo.png',
       latitude: 42.3150,
       longitude: 69.5960,
     },
@@ -273,8 +275,8 @@ const addUniversity = async (
 
   // Создать запись в таблице universities
   const result = await client.queryObject<{ id: string }>(
-    `INSERT INTO universities (name, name_en, country, city, website_url, latitude, longitude, is_active)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, true)
+    `INSERT INTO universities (name, name_en, country, city, website_url, logo_url, latitude, longitude, is_active)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
      RETURNING id`,
     [
       baseData.name,
@@ -282,6 +284,7 @@ const addUniversity = async (
       baseData.country,
       baseData.city,
       baseData.website_url,
+      baseData.logo_url,
       baseData.latitude,
       baseData.longitude,
     ]

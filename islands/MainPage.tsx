@@ -13,6 +13,7 @@ import { UniversityBaseTab } from '../src/components/tabs/UniversityBaseTab.tsx'
 import { BattleTab } from '../src/components/tabs/BattleTab.tsx';
 import { ChatBotTab } from '../src/components/tabs/ChatBotTab.tsx';
 import { AdminTab } from '../src/components/tabs/AdminTab.tsx';
+import { LanguageProvider } from '../src/contexts/LanguageContext.tsx';
 
 const STORAGE_KEY = 'activeTab';
 const VALID_TABS: TabId[] = ['search', 'base', 'battle', 'chat', 'admin'];
@@ -76,34 +77,36 @@ export default function MainPage() {
   };
 
   return (
-    <MainLayout
-      activeTab={activeTab.value}
-      onTabChange={handleTabChange}
-      mobileMenuOpen={mobileMenuOpen.value}
-      onMobileMenuToggle={handleMobileMenuToggle}
-    >
-      {/* Tab Panels with animations */}
-      <div class="flex-1 flex flex-col">
-        <TabPanel id="search" isActive={activeTab.value === 'search'}>
-          <SmartSearchTab />
-        </TabPanel>
+    <LanguageProvider>
+      <MainLayout
+        activeTab={activeTab.value}
+        onTabChange={handleTabChange}
+        mobileMenuOpen={mobileMenuOpen.value}
+        onMobileMenuToggle={handleMobileMenuToggle}
+      >
+        {/* Tab Panels with animations */}
+        <div class="flex-1 flex flex-col">
+          <TabPanel id="search" isActive={activeTab.value === 'search'}>
+            <SmartSearchTab />
+          </TabPanel>
 
-        <TabPanel id="base" isActive={activeTab.value === 'base'}>
-          <UniversityBaseTab />
-        </TabPanel>
+          <TabPanel id="base" isActive={activeTab.value === 'base'}>
+            <UniversityBaseTab />
+          </TabPanel>
 
-        <TabPanel id="battle" isActive={activeTab.value === 'battle'}>
-          <BattleTab />
-        </TabPanel>
+          <TabPanel id="battle" isActive={activeTab.value === 'battle'}>
+            <BattleTab />
+          </TabPanel>
 
-        <TabPanel id="chat" isActive={activeTab.value === 'chat'}>
-          <ChatBotTab />
-        </TabPanel>
+          <TabPanel id="chat" isActive={activeTab.value === 'chat'}>
+            <ChatBotTab />
+          </TabPanel>
 
-        <TabPanel id="admin" isActive={activeTab.value === 'admin'}>
-          <AdminTab />
-        </TabPanel>
-      </div>
-    </MainLayout>
+          <TabPanel id="admin" isActive={activeTab.value === 'admin'}>
+            <AdminTab />
+          </TabPanel>
+        </div>
+      </MainLayout>
+    </LanguageProvider>
   );
 }

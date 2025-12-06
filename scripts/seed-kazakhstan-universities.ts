@@ -20,6 +20,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Казахский национальный университет им. аль-Фараби',
     name_en: 'Al-Farabi Kazakh National University',
     website: 'https://www.kaznu.kz/',
+    logo_url: 'https://www.kaznu.kz/content/images/logo.png',
     city: 'Almaty',
     latitude: 43.2220,
     longitude: 76.9265,
@@ -28,6 +29,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Назарбаев Университет',
     name_en: 'Nazarbayev University',
     website: 'https://nu.edu.kz/',
+    logo_url: 'https://nu.edu.kz/wp-content/themes/flavor/assets/images/logo.svg',
     city: 'Astana',
     latitude: 51.0906,
     longitude: 71.3984,
@@ -36,6 +38,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Казахстанско-Британский технический университет',
     name_en: 'Kazakh-British Technical University (KBTU)',
     website: 'https://www.kbtu.kz/',
+    logo_url: 'https://kbtu.kz/images/logo.svg',
     city: 'Almaty',
     latitude: 43.2380,
     longitude: 76.9440,
@@ -44,6 +47,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Евразийский национальный университет им. Л.Н. Гумилёва',
     name_en: 'L.N. Gumilyov Eurasian National University',
     website: 'https://www.enu.kz/',
+    logo_url: 'https://www.enu.kz/images/logo.png',
     city: 'Astana',
     latitude: 51.1280,
     longitude: 71.4306,
@@ -52,6 +56,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Казахский национальный исследовательский технический университет им. К.И. Сатпаева',
     name_en: 'Satbayev University (KazNRTU)',
     website: 'https://satbayev.university/',
+    logo_url: 'https://satbayev.university/storage/pages/December2021/logo-satbayev.png',
     city: 'Almaty',
     latitude: 43.2330,
     longitude: 76.9200,
@@ -60,6 +65,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Казахский национальный медицинский университет им. С.Д. Асфендиярова',
     name_en: 'Asfendiyarov Kazakh National Medical University',
     website: 'https://kaznmu.kz/',
+    logo_url: 'https://kaznmu.kz/wp-content/uploads/2020/07/logo.png',
     city: 'Almaty',
     latitude: 43.2380,
     longitude: 76.9450,
@@ -68,6 +74,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Международный университет информационных технологий',
     name_en: 'International IT University (IITU)',
     website: 'https://iitu.edu.kz/',
+    logo_url: 'https://iitu.edu.kz/wp-content/themes/flavor/assets/images/logo.svg',
     city: 'Almaty',
     latitude: 43.2284,
     longitude: 76.8735,
@@ -76,6 +83,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Университет Туран',
     name_en: 'Turan University',
     website: 'https://www.turan-edu.kz/',
+    logo_url: 'https://www.turan-edu.kz/images/logo.png',
     city: 'Almaty',
     latitude: 43.2310,
     longitude: 76.9070,
@@ -84,6 +92,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Алматы Менеджмент Университет (AlmaU)',
     name_en: 'Almaty Management University',
     website: 'https://almau.edu.kz/',
+    logo_url: 'https://almau.edu.kz/wp-content/uploads/2023/01/logo.png',
     city: 'Almaty',
     latitude: 43.2270,
     longitude: 76.9430,
@@ -92,6 +101,7 @@ const KAZAKHSTAN_UNIVERSITIES = [
     name: 'Южно-Казахстанский университет им. М. Ауэзова',
     name_en: 'M. Auezov South Kazakhstan University',
     website: 'https://auezov.edu.kz/',
+    logo_url: 'https://auezov.edu.kz/images/logo.png',
     city: 'Shymkent',
     latitude: 42.3150,
     longitude: 69.5960,
@@ -159,19 +169,19 @@ const loadUniversity = async (
         universityId = existing.rows[0].id;
         await client.queryObject(
           `UPDATE universities SET
-            name = $1, name_en = $2, latitude = $3, longitude = $4, updated_at = NOW()
-           WHERE id = $5`,
-          [uni.name, uni.name_en, uni.latitude, uni.longitude, universityId]
+            name = $1, name_en = $2, latitude = $3, longitude = $4, logo_url = $5, updated_at = NOW()
+           WHERE id = $6`,
+          [uni.name, uni.name_en, uni.latitude, uni.longitude, uni.logo_url, universityId]
         );
       } else {
         // Создать новый
         const uniResult = await client.queryObject<{ id: string }>(
           `INSERT INTO universities (
             name, name_en, country, city, website_url, 
-            latitude, longitude, is_active
-          ) VALUES ($1, $2, 'Kazakhstan', $3, $4, $5, $6, true)
+            latitude, longitude, logo_url, is_active
+          ) VALUES ($1, $2, 'Kazakhstan', $3, $4, $5, $6, $7, true)
           RETURNING id`,
-          [uni.name, uni.name_en, uni.city, uni.website, uni.latitude, uni.longitude]
+          [uni.name, uni.name_en, uni.city, uni.website, uni.latitude, uni.longitude, uni.logo_url]
         );
         universityId = uniResult.rows[0].id;
       }
@@ -241,14 +251,14 @@ const createFallbackUniversity = async (
       if (existing.rows.length > 0) {
         universityId = existing.rows[0].id;
         await client.queryObject(
-          `UPDATE universities SET name = $1, name_en = $2, latitude = $3, longitude = $4, updated_at = NOW() WHERE id = $5`,
-          [uni.name, uni.name_en, uni.latitude, uni.longitude, universityId]
+          `UPDATE universities SET name = $1, name_en = $2, latitude = $3, longitude = $4, logo_url = $5, updated_at = NOW() WHERE id = $6`,
+          [uni.name, uni.name_en, uni.latitude, uni.longitude, uni.logo_url, universityId]
         );
       } else {
         const uniResult = await client.queryObject<{ id: string }>(
-          `INSERT INTO universities (name, name_en, country, city, website_url, latitude, longitude, is_active)
-           VALUES ($1, $2, 'Kazakhstan', $3, $4, $5, $6, true) RETURNING id`,
-          [uni.name, uni.name_en, uni.city, uni.website, uni.latitude, uni.longitude]
+          `INSERT INTO universities (name, name_en, country, city, website_url, latitude, longitude, logo_url, is_active)
+           VALUES ($1, $2, 'Kazakhstan', $3, $4, $5, $6, $7, true) RETURNING id`,
+          [uni.name, uni.name_en, uni.city, uni.website, uni.latitude, uni.longitude, uni.logo_url]
         );
         universityId = uniResult.rows[0].id;
       }
