@@ -30,21 +30,21 @@ export const ChatHeader = ({ onClear, language = 'ru' }: ChatHeaderProps) => {
     : 'Clear';
 
   return (
-    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-dark-600 bg-dark-800">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-lg">
+        <div class="w-10 h-10 bg-gradient-to-br from-cyber-500 to-neon-500 rounded-full flex items-center justify-center text-dark-900 text-lg">
           🎓
         </div>
         <div>
-          <h3 class="font-semibold text-gray-900">{title}</h3>
-          <p class="text-xs text-gray-500">{subtitle}</p>
+          <h3 class="font-semibold text-white">{title}</h3>
+          <p class="text-xs text-gray-400">{subtitle}</p>
         </div>
       </div>
 
       <button
         type="button"
         onClick={onClear}
-        class="text-sm text-gray-500 hover:text-red-500 transition-colors px-2 py-1 rounded hover:bg-red-50"
+        class="text-sm text-gray-400 hover:text-red-400 transition-colors px-2 py-1 rounded hover:bg-red-500/10"
       >
         {clearText}
       </button>

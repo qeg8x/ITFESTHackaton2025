@@ -30,15 +30,15 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
       <div
         class={`max-w-[80%] rounded-2xl px-4 py-3 ${
           isUser
-            ? 'bg-blue-600 text-white rounded-br-md'
-            : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
+            ? 'bg-cyber-500 text-dark-900 rounded-br-md'
+            : 'bg-dark-700 text-gray-200 border border-dark-600 rounded-bl-md'
         }`}
       >
         {/* Avatar для ассистента */}
         {!isUser && (
           <div class="flex items-center gap-2 mb-1">
             <span class="text-lg">🤖</span>
-            <span class="text-xs font-medium text-gray-500">Ассистент</span>
+            <span class="text-xs font-medium text-gray-400">AI</span>
           </div>
         )}
 
@@ -48,7 +48,7 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
         {/* Время */}
         <p
           class={`text-xs mt-1 ${
-            isUser ? 'text-blue-200' : 'text-gray-400'
+            isUser ? 'text-dark-700' : 'text-gray-500'
           }`}
         >
           {formatTime(message.timestamp)}

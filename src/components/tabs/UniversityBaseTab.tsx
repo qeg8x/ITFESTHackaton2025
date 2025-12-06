@@ -5,6 +5,7 @@
 
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 interface University {
   id: string;
@@ -25,6 +26,7 @@ interface Filters {
  * Tab контейнер для базы университетов с фильтрами
  */
 export const UniversityBaseTab = () => {
+  const { t } = useLanguage();
   const universities = useSignal<University[]>([]);
   const loading = useSignal(true);
   const filters = useSignal<Filters>({ country: '', search: '' });
@@ -71,7 +73,7 @@ export const UniversityBaseTab = () => {
             <div class="flex-1">
               <input
                 type="text"
-                placeholder="Поиск по названию..."
+                placeholder={t('search.placeholder')}
                 value={filters.value.search}
                 onInput={(e) => {
                   filters.value = {
@@ -95,7 +97,7 @@ export const UniversityBaseTab = () => {
                 }}
                 class="w-full px-4 py-2.5 bg-dark-700 border border-dark-600 text-white rounded-lg focus:ring-2 focus:ring-cyber-500/20 focus:border-cyber-500 outline-none transition-all"
               >
-                <option value="">Все страны</option>
+                <option value="">{t('filters.allCountries')}</option>
                 {countries.value.map((country) => (
                   <option key={country} value={country}>
                     {country}
@@ -107,7 +109,7 @@ export const UniversityBaseTab = () => {
 
           {/* Stats */}
           <div class="mt-3 text-sm text-gray-500">
-            Найдено: <span class="text-cyber-400">{filteredUniversities.length}</span> из {universities.value.length}
+            {t('search.found')}: <span class="text-cyber-400">{filteredUniversities.length}</span> / {universities.value.length}
           </div>
         </div>
       </div>
@@ -122,12 +124,12 @@ export const UniversityBaseTab = () => {
           ) : filteredUniversities.length === 0 ? (
             <div class="text-center py-12">
               <span class="text-4xl">📚</span>
-              <p class="mt-4 text-gray-500">Университеты не найдены</p>
+              <p class="mt-4 text-gray-500">{t('common.noResults')}</p>
             </div>
           ) : (
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredUniversities.map((uni) => (
-                <UniversityCard key={uni.id} university={uni} />
+                <UniversityCard key={uni.id} university={uni} programsLabel={t('university.programsCount')} />
               ))}
             </div>
           )}
@@ -139,12 +141,13 @@ export const UniversityBaseTab = () => {
 
 interface UniversityCardProps {
   university: University;
+  programsLabel: string;
 }
 
 /**
  * Карточка университета - тёмная тема
  */
-const UniversityCard = ({ university }: UniversityCardProps) => (
+const UniversityCard = ({ university, programsLabel }: UniversityCardProps) => (
   <a
     href={`/universities/${university.id}`}
     class="block p-4 bg-dark-800 border border-dark-600 rounded-xl hover:border-cyber-500/50 hover:shadow-glow transition-all duration-200 group"
@@ -161,7 +164,7 @@ const UniversityCard = ({ university }: UniversityCardProps) => (
     </div>
     <div class="mt-3 flex items-center justify-between">
       <span class="text-sm text-gray-500">
-        {university.programs_count} программ
+        {university.programs_count} {programsLabel}
       </span>
       <div class="flex items-center gap-1">
         <div class="w-16 h-1.5 bg-dark-600 rounded-full overflow-hidden">

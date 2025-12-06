@@ -119,26 +119,26 @@ export const UniversityMap = ({
       {/* Заголовок */}
       <div class="flex items-center gap-2 mb-3">
         <span class="text-lg">📍</span>
-        <h3 class="font-semibold text-gray-900">Расположение</h3>
+        <h3 class="font-semibold text-white">Расположение</h3>
       </div>
 
       {/* Контейнер карты */}
       <div
         ref={mapContainerRef}
-        class="w-full h-64 md:h-80 rounded-xl overflow-hidden border border-gray-200 bg-gray-100"
+        class="w-full h-64 md:h-80 rounded-xl overflow-hidden border border-dark-600 bg-dark-700"
         style={{ minHeight: '250px' }}
       >
         {!isLoaded.value && !error.value && (
           <div class="flex items-center justify-center h-full">
-            <div class="flex items-center gap-2 text-gray-500">
-              <div class="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div class="flex items-center gap-2 text-gray-400">
+              <div class="w-5 h-5 border-2 border-cyber-500 border-t-transparent rounded-full animate-spin" />
               <span>Загрузка карты...</span>
             </div>
           </div>
         )}
 
         {error.value && (
-          <div class="flex items-center justify-center h-full text-red-500">
+          <div class="flex items-center justify-center h-full text-red-400">
             {error.value}
           </div>
         )}
@@ -146,7 +146,7 @@ export const UniversityMap = ({
 
       {/* Адрес под картой */}
       {address && (
-        <p class="mt-2 text-sm text-gray-600">
+        <p class="mt-2 text-sm text-gray-400">
           {address}
         </p>
       )}
@@ -156,7 +156,7 @@ export const UniversityMap = ({
         href={`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}&zoom=15`}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex items-center gap-1 mt-2 text-sm text-blue-600 hover:text-blue-700"
+        class="inline-flex items-center gap-1 mt-2 text-sm text-cyber-400 hover:text-cyber-300"
       >
         Открыть в OpenStreetMap
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,34 +174,58 @@ export const UniversityMapStatic = ({
   latitude,
   longitude,
   name,
+  address,
 }: UniversityMapProps) => {
   if (!latitude || !longitude) {
     return null;
   }
 
-  // Используем OpenStreetMap Static API через статический URL
-  const staticMapUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=14&size=600x300&maptype=mapnik&markers=${latitude},${longitude},red-pushpin`;
+  // Используем Google Maps Embed API
+  const googleMapsApiKey = 'AIzaSyBY5JSVAGaGC2fc1LDejaPkzXPeo6Nw6k8';
+  const googleMapsUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${latitude},${longitude}&zoom=15&maptype=roadmap`;
+  
+  // Google Maps ссылка для открытия
+  const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 
   return (
     <div class="relative">
       <div class="flex items-center gap-2 mb-3">
         <span class="text-lg">📍</span>
-        <h3 class="font-semibold text-gray-900">Расположение</h3>
+        <h3 class="font-semibold text-white">Расположение</h3>
       </div>
 
-      <a
-        href={`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}&zoom=15`}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="block rounded-xl overflow-hidden border border-gray-200"
-      >
-        <img
-          src={staticMapUrl}
-          alt={`Карта: ${name}`}
-          class="w-full h-64 object-cover"
+      {/* Google Maps Embed */}
+      <div class="rounded-xl overflow-hidden border border-dark-600">
+        <iframe
+          src={googleMapsUrl}
+          class="w-full h-64 md:h-80 border-0"
+          allowFullScreen
           loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title={`Карта: ${name}`}
         />
-      </a>
+      </div>
+
+      {/* Адрес и ссылки */}
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+        {address && (
+          <p class="text-sm text-gray-400">
+            {address}
+          </p>
+        )}
+        
+        <a
+          href={googleMapsLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1 text-sm text-cyber-400 hover:text-cyber-300"
+        >
+          Открыть в Google Maps
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+      </div>
     </div>
   );
 };

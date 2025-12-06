@@ -25,10 +25,10 @@ interface CardProps {
  * Стили вариантов
  */
 const variantStyles: Record<CardVariant, string> = {
-  default: 'bg-white rounded-2xl shadow-card',
-  elevated: 'bg-white rounded-2xl shadow-elevated',
-  outline: 'bg-white rounded-2xl border-2 border-gray-100',
-  ghost: 'bg-gray-50 rounded-2xl',
+  default: 'bg-dark-800 rounded-2xl border border-dark-600',
+  elevated: 'bg-dark-800 rounded-2xl border border-dark-600 shadow-elevated-dark',
+  outline: 'bg-dark-800 rounded-2xl border-2 border-dark-600',
+  ghost: 'bg-dark-700/50 rounded-2xl',
 };
 
 /**
@@ -93,8 +93,8 @@ export const CardHeader = ({
   return (
     <div class={`flex items-start justify-between mb-4 ${className}`}>
       <div>
-        {title && <h3 class="text-lg font-semibold text-gray-900">{title}</h3>}
-        {subtitle && <p class="text-sm text-gray-500 mt-1">{subtitle}</p>}
+        {title && <h3 class="text-lg font-semibold text-white">{title}</h3>}
+        {subtitle && <p class="text-sm text-gray-400 mt-1">{subtitle}</p>}
       </div>
       {action && <div class="ml-4 flex-shrink-0">{action}</div>}
     </div>
@@ -139,7 +139,7 @@ export const CardFooter = ({
     <div
       class={`
         mt-4 pt-4
-        ${divider ? 'border-t border-gray-100' : ''}
+        ${divider ? 'border-t border-dark-600' : ''}
         ${className}
       `}
     >

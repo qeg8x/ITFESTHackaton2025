@@ -72,7 +72,7 @@ export const BattleTab = () => {
   const comparisons: ComparisonResult[] = uni1.value && uni2.value
     ? [
         {
-          category: 'Программы',
+          category: t('university.programs'),
           uni1Value: uni1.value.programs_count,
           uni2Value: uni2.value.programs_count,
           winner:
@@ -83,7 +83,7 @@ export const BattleTab = () => {
               : 'tie',
         },
         {
-          category: 'Полнота данных',
+          category: t('battle.dataCompleteness'),
           uni1Value: `${uni1.value.completeness}%`,
           uni2Value: `${uni2.value.completeness}%`,
           winner:
@@ -94,7 +94,7 @@ export const BattleTab = () => {
               : 'tie',
         },
         {
-          category: 'Мировой рейтинг',
+          category: t('battle.worldRanking'),
           uni1Value: uni1.value.ranking_world || 'N/A',
           uni2Value: uni2.value.ranking_world || 'N/A',
           winner:

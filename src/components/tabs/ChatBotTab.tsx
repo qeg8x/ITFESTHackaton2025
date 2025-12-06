@@ -5,6 +5,7 @@
 
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 interface Message {
   id: string;
@@ -16,18 +17,68 @@ interface Message {
 /**
  * Tab контейнер для чат-бота
  */
+const CHAT_STORAGE_KEY = 'university_chat_history';
+
 export const ChatBotTab = () => {
-  const messages = useSignal<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Привет! 👋 Я AI-ассистент по выбору университета. Задайте мне вопрос о любом университете, программе обучения или поступлении!',
-      timestamp: new Date(),
-    },
-  ]);
+  const { t } = useLanguage();
+  const messages = useSignal<Message[]>([]);
   const inputValue = useSignal('');
   const isLoading = useSignal(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isInitialized = useSignal(false);
+
+  // Загрузка истории из localStorage или инициализация приветствия
+  useEffect(() => {
+    if (!isInitialized.value) {
+      try {
+        const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            messages.value = parsed.map((m: Message) => ({
+              ...m,
+              timestamp: new Date(m.timestamp),
+            }));
+            isInitialized.value = true;
+            return;
+          }
+        }
+      } catch {
+        // ignore
+      }
+      
+      // Если нет сохранённых сообщений — показать приветствие
+      messages.value = [{
+        id: '1',
+        role: 'assistant',
+        content: t('chat.greeting'),
+        timestamp: new Date(),
+      }];
+      isInitialized.value = true;
+    }
+  }, [t]);
+
+  // Сохранение в localStorage при изменении сообщений
+  useEffect(() => {
+    if (isInitialized.value && messages.value.length > 0) {
+      try {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages.value));
+      } catch {
+        // ignore
+      }
+    }
+  }, [messages.value]);
+
+  // Очистка чата
+  const handleClearChat = () => {
+    messages.value = [{
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: t('chat.greeting'),
+      timestamp: new Date(),
+    }];
+    localStorage.removeItem(CHAT_STORAGE_KEY);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -99,17 +150,17 @@ export const ChatBotTab = () => {
   };
 
   const suggestedQuestions = [
-    'Какие университеты есть в Казахстане?',
-    'Сколько стоит обучение в MIT?',
-    'Лучшие IT-программы в Европе',
-    'Как поступить в Гарвард?',
+    t('chat.suggestion1') || 'Какие университеты есть в Казахстане?',
+    t('chat.suggestion2') || 'Сколько стоит обучение в MIT?',
+    t('chat.suggestion3') || 'Лучшие IT-программы в Европе',
+    t('chat.suggestion4') || 'Как поступить в Гарвард?',
   ];
 
   return (
-    <div class="h-full flex flex-col bg-dark-900">
+    <div class="h-full flex flex-col items-center bg-dark-900">
       {/* Messages Area */}
-      <div class="flex-1 overflow-y-auto p-4 scrollbar-thin">
-        <div class="max-w-3xl mx-auto space-y-4">
+      <div class="flex-1 w-full max-w-2xl overflow-y-auto p-4 scrollbar-thin">
+        <div class="space-y-4">
           {messages.value.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />
           ))}
@@ -136,9 +187,9 @@ export const ChatBotTab = () => {
 
       {/* Suggested Questions (shown when only welcome message) */}
       {messages.value.length === 1 && (
-        <div class="px-4 pb-2">
-          <div class="max-w-3xl mx-auto">
-            <p class="text-sm text-gray-500 mb-2">Попробуйте спросить:</p>
+        <div class="w-full max-w-2xl px-4 pb-2">
+          <div>
+            <p class="text-sm text-gray-500 mb-2">{t('chat.suggestions')}:</p>
             <div class="flex flex-wrap gap-2">
               {suggestedQuestions.map((q) => (
                 <button
@@ -156,12 +207,21 @@ export const ChatBotTab = () => {
       )}
 
       {/* Input Area */}
-      <div class="border-t border-dark-600 bg-dark-800 p-4">
-        <div class="max-w-3xl mx-auto">
+      <div class="w-full max-w-2xl p-4">
+        <div class="bg-dark-800 border border-dark-600 rounded-2xl p-4">
           <div class="flex gap-3">
+            {/* Clear chat button */}
+            <button
+              type="button"
+              onClick={handleClearChat}
+              class="px-3 py-3 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+              title={t('chat.clear') || 'Очистить чат'}
+            >
+              🗑️
+            </button>
             <input
               type="text"
-              placeholder="Задайте вопрос..."
+              placeholder={t('chat.placeholder')}
               value={inputValue.value}
               onInput={(e) => { inputValue.value = (e.target as HTMLInputElement).value; }}
               onKeyDown={handleKeyDown}
@@ -174,12 +234,12 @@ export const ChatBotTab = () => {
               disabled={!inputValue.value.trim() || isLoading.value}
               class="px-6 py-3 bg-cyber-500 text-dark-900 font-medium rounded-xl hover:bg-cyber-400 hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <span class="hidden sm:inline">Отправить</span>
+              <span class="hidden sm:inline">{t('chat.send')}</span>
               <span class="sm:hidden">➤</span>
             </button>
           </div>
-          <p class="text-xs text-gray-500 mt-2 text-center">
-            AI может давать неточные ответы. Проверяйте важную информацию.
+          <p class="text-xs text-gray-500 mt-3 text-center">
+            {t('chat.disclaimer')}
           </p>
         </div>
       </div>

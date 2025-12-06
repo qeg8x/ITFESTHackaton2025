@@ -16,8 +16,17 @@
     "all": "All",
     "none": "None",
     "back": "Back",
+    "backToSearch": "Back to search",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "open": "Open",
+    "openProfile": "Open profile",
+    "viewAll": "View all",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "updated": "Updated",
+    "lastUpdated": "Last updated",
+    "dataUpdatedAt": "Data updated"
   },
   "tabs": {
     "smartSearch": "Smart Search",
@@ -77,11 +86,16 @@
   "university": {
     "programs": "Programs",
     "programsCount": "programs",
+    "educationalPrograms": "Educational Programs",
     "contacts": "Contacts",
     "admissions": "Admissions",
+    "admissionRequirements": "Admission Requirements",
     "tuition": "Tuition",
+    "tuitionFee": "Tuition Fee",
+    "perYear": "per year",
     "rankings": "Rankings",
     "scholarships": "Scholarships",
+    "scholarshipsAndGrants": "Scholarships and Grants",
     "campus": "Campus",
     "international": "International students",
     "founded": "Founded in",
@@ -92,7 +106,42 @@
     "address": "Address",
     "requirements": "Requirements",
     "deadline": "Deadline",
-    "noInfo": "No information"
+    "noInfo": "No information",
+    "about": "About University",
+    "description": "Description",
+    "mission": "Mission",
+    "location": "Location",
+    "openOnMap": "Open on map",
+    "coverage": "coverage",
+    "degree": {
+      "bachelor": "Bachelor",
+      "master": "Master",
+      "phd": "PhD",
+      "diploma": "Diploma"
+    },
+    "language": {
+      "kazakh": "Kazakh",
+      "russian": "Russian",
+      "english": "English"
+    }
+  },
+  "streetView": {
+    "title": "Street View Panorama",
+    "subtitle": "Panoramic view of the campus",
+    "openPanorama": "Open panorama",
+    "openFullscreen": "Fullscreen",
+    "openMap": "Open on map",
+    "loading": "Loading panorama...",
+    "hint": "Use mouse to rotate • Scroll to zoom"
+  },
+  "searchResults": {
+    "found": "Found",
+    "universities": "universities",
+    "inDatabase": "In database",
+    "alreadyInDatabase": "Already in database!",
+    "notInDatabase": "Not in database — can be added",
+    "addToDatabase": "Add to database",
+    "universityExists": "This university is already in our database"
   },
   "battle": {
     "title": "University Comparison",
@@ -100,36 +149,46 @@
     "selectFirst": "Select first university",
     "selectSecond": "Select second university",
     "searchPlaceholder": "Search university...",
-    "compare": "Compare",
+    "compare": "AI Compare",
     "results": "Comparison results",
     "category": "Category",
     "winner": "Winner",
     "tie": "Tie",
-    "selectBoth": "Select two universities to start"
+    "selectBoth": "Select two universities to start",
+    "dataCompleteness": "Data Completeness",
+    "worldRanking": "World Ranking"
   },
   "chat": {
     "title": "Chat Assistant",
-    "greeting": "Hello! 👋 I'm an AI assistant. Ask me anything about universities!",
-    "placeholder": "Ask about universities...",
+    "greeting": "Hello! 👋 I'm an AI university advisor. Ask me about any university, study program, or admissions!",
+    "placeholder": "Ask a question...",
     "send": "Send",
     "assistant": "Assistant",
     "you": "You",
     "suggestions": "Try asking",
-    "disclaimer": "AI may provide inaccurate answers. Verify important information."
+    "disclaimer": "AI may provide inaccurate answers. Verify important information.",
+    "suggestion1": "What universities are in Kazakhstan?",
+    "suggestion2": "How much does MIT cost?",
+    "suggestion3": "Best IT programs in Europe",
+    "suggestion4": "How to get into Harvard?",
+    "clear": "Clear chat"
   },
   "admin": {
     "title": "Admin Panel",
-    "subtitle": "Manage data and system settings",
-    "universities": "Manage Universities",
-    "universitiesDesc": "Add, edit, and delete universities",
-    "logs": "System Logs",
-    "logsDesc": "View logs and errors",
-    "parser": "Data Parsing",
-    "parserDesc": "Update university data",
-    "settings": "Settings",
-    "settingsDesc": "System configuration",
+    "subtitle": "System management and settings",
+    "enterKey": "Enter admin key",
+    "invalidKey": "Invalid key",
+    "logout": "Logout",
+    "authRequired": "Authorization required",
     "fullPanel": "Open full admin panel",
-    "authRequired": "Authorization required"
+    "universities": "University Management",
+    "universitiesDesc": "Add, edit and delete",
+    "logs": "System Logs",
+    "logsDesc": "View system logs and errors",
+    "parser": "Data Parsing",
+    "parserDesc": "Run data updates",
+    "settings": "Settings",
+    "settingsDesc": "System configuration"
   },
   "errors": {
     "generic": "An error occurred",
@@ -142,5 +201,40 @@
   "footer": {
     "copyright": "Digital University © 2025",
     "dataUpdated": "Data is updated automatically using AI"
+  },
+  "howItWorks": {
+    "search": "Search",
+    "searchDesc": "In database",
+    "aiCheck": "AI verification",
+    "aiCheckDesc": "If not in database",
+    "add": "Add",
+    "addDesc": "Auto parsing"
+  },
+  "programs": {
+    "title": "Study Programs",
+    "bachelor": "Bachelor",
+    "master": "Master",
+    "phd": "PhD",
+    "duration": "Duration",
+    "years": "years",
+    "tuition": "Tuition",
+    "perYear": "per year",
+    "language": "Language"
+  },
+  "profile": {
+    "about": "About University",
+    "contacts": "Contacts",
+    "location": "Location",
+    "programs": "Programs",
+    "admissions": "Admissions",
+    "scholarships": "Scholarships",
+    "rankings": "Rankings",
+    "virtualTour": "Virtual Tour",
+    "founded": "Founded",
+    "students": "students",
+    "website": "Website",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
   }
 }

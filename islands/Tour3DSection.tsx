@@ -1,235 +1,138 @@
 /**
- * Island компонент для секции 3D-тура на странице университета
+ * Island компонент для секции 3D-тура (Google Street View)
+ * Встроенная панорама прямо на странице
  */
 
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import type { ThreeDTourProvider, ThreeDTourSource } from '../src/types/university.ts';
+
+/** API ключ для Street View API */
+const STREET_VIEW_API_KEY = 'AIzaSyBY5JSVAGaGC2fc1LDejaPkzXPeo6Nw6k8';
 
 interface Tour3DSectionProps {
   universityId: string;
   universityName: string;
-}
-
-interface TourData {
-  id: string;
-  name: string;
-  available_sources: ThreeDTourProvider[];
-  primary_source: ThreeDTourProvider | null;
-  tour_data: {
-    google_maps?: ThreeDTourSource;
-    yandex_panorama?: ThreeDTourSource;
-    twogis?: ThreeDTourSource;
-  } | null;
-}
-
-/**
- * Получить название источника
- */
-const getSourceLabel = (source: ThreeDTourProvider): string => {
-  const labels: Record<ThreeDTourProvider, string> = {
-    google: '🔵 Google Street View',
-    yandex: '🔴 Яндекс Панорамы',
-    '2gis': '📍 2GIS',
+  latitude?: number | null;
+  longitude?: number | null;
+  /** Переводы передаются через props для избежания проблем с island контекстом */
+  translations?: {
+    title: string;
+    openFullscreen: string;
+    loading: string;
+    hint: string;
   };
-  return labels[source];
+}
+
+/** Дефолтные переводы */
+const DEFAULT_TRANSLATIONS = {
+  title: '3D-тур по кампусу',
+  openFullscreen: 'Открыть на весь экран',
+  loading: 'Загрузка панорамы...',
+  hint: 'Используйте мышь для навигации по панораме',
 };
 
 /**
- * Получить ключ источника
+ * Секция 3D-тура - встроенная Google Street View панорама
  */
-const getSourceKey = (source: ThreeDTourProvider): 'google_maps' | 'yandex_panorama' | 'twogis' => {
-  const keys: Record<ThreeDTourProvider, 'google_maps' | 'yandex_panorama' | 'twogis'> = {
-    google: 'google_maps',
-    yandex: 'yandex_panorama',
-    '2gis': 'twogis',
-  };
-  return keys[source];
-};
+export default function Tour3DSection({ 
+  universityId: _universityId, 
+  universityName, 
+  latitude, 
+  longitude,
+  translations,
+}: Tour3DSectionProps) {
+  const t = translations || DEFAULT_TRANSLATIONS;
+  const iframeLoading = useSignal(true);
+  const hasCoords = latitude && longitude;
 
-/**
- * Секция 3D-тура
- */
-export default function Tour3DSection({ universityId, universityName: _universityName }: Tour3DSectionProps) {
-  const tourData = useSignal<TourData | null>(null);
-  const loading = useSignal(true);
-  const error = useSignal<string | null>(null);
-  const isExpanded = useSignal(false);
-  const selectedSource = useSignal<ThreeDTourProvider | null>(null);
-  const iframeLoading = useSignal(false);
-
-  // Загрузка данных тура
+  // Резервный таймаут на случай если onLoad не срабатывает
   useEffect(() => {
-    const loadTour = async () => {
-      try {
-        const response = await fetch(`/api/universities/${universityId}/3d-tour`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          tourData.value = data;
-          selectedSource.value = data.primary_source || data.available_sources?.[0] || null;
-        } else if (response.status === 404) {
-          // Тур не найден - это нормально
-          tourData.value = null;
-        } else {
-          error.value = 'Не удалось загрузить тур';
-        }
-      } catch (err) {
-        console.error('Error loading tour:', err);
-        error.value = 'Ошибка загрузки';
-      } finally {
-        loading.value = false;
+    const timeout = setTimeout(() => {
+      if (iframeLoading.value) {
+        iframeLoading.value = false;
       }
-    };
+    }, 5000); // Уменьшил до 5 секунд
+    
+    return () => clearTimeout(timeout);
+  }, []);
 
-    loadTour();
-  }, [universityId]);
+  /**
+   * Получить URL для встроенной Street View панорамы
+   */
+  const getStreetViewEmbedUrl = (): string => {
+    if (hasCoords) {
+      // Street View панорама по координатам
+      return `https://www.google.com/maps/embed/v1/streetview?key=${STREET_VIEW_API_KEY}&location=${latitude},${longitude}&heading=0&pitch=0&fov=90`;
+    }
+    // Поиск по названию
+    return `https://www.google.com/maps/embed/v1/place?key=${STREET_VIEW_API_KEY}&q=${encodeURIComponent(universityName)}`;
+  };
 
-  // Не показывать секцию если нет тура
-  if (loading.value) {
-    return null; // Не показывать skeleton - просто скрыть
-  }
-
-  if (!tourData.value || !tourData.value.available_sources?.length) {
-    return null; // Тур недоступен - не показывать секцию
-  }
-
-  const currentSource = selectedSource.value;
-  const currentTour = currentSource && tourData.value.tour_data 
-    ? tourData.value.tour_data[getSourceKey(currentSource)]
-    : null;
+  /**
+   * Открыть полноэкранную панораму в новой вкладке
+   */
+  const openFullscreen = () => {
+    const url = hasCoords
+      ? `https://www.google.com/maps/@${latitude},${longitude},3a,75y,0h,90t/data=!3m6!1e1!3m4!1s!2e0!7i16384!8i8192`
+      : `https://www.google.com/maps/search/${encodeURIComponent(universityName)}`;
+    globalThis.open(url, '_blank');
+  };
 
   return (
     <section class="bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
-      {/* Header - всегда видимый */}
-      <button
-        type="button"
-        onClick={() => {
-          isExpanded.value = !isExpanded.value;
-          if (isExpanded.value) {
-            iframeLoading.value = true;
-          }
-        }}
-        class="w-full flex items-center justify-between p-6 hover:bg-dark-700 transition-colors"
-      >
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 bg-gradient-to-br from-cyber-500/20 to-neon-500/20 rounded-lg flex items-center justify-center">
-            <span class="text-2xl">🎬</span>
+      {/* Header */}
+      <div class="p-4 border-b border-dark-600 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg flex items-center justify-center border border-blue-500/30">
+            <span class="text-xl">🎬</span>
           </div>
-          <div class="text-left">
-            <h2 class="text-xl font-semibold text-white">3D Виртуальный тур</h2>
-            <p class="text-sm text-gray-400">
-              Доступно источников: {tourData.value.available_sources.length} 
-              ({tourData.value.available_sources.map(s => s === 'google' ? 'Google' : s === 'yandex' ? 'Яндекс' : '2GIS').join(', ')})
+          <div>
+            <h2 class="text-lg font-semibold text-white">{t.title}</h2>
+            <p class="text-xs text-gray-400">
+              {hasCoords ? `${latitude!.toFixed(4)}, ${longitude!.toFixed(4)}` : universityName}
             </p>
           </div>
         </div>
         
-        <div class="flex items-center gap-2">
-          <span class="px-3 py-1 bg-cyber-500/20 text-cyber-400 text-sm rounded-full">
-            {isExpanded.value ? 'Свернуть' : 'Развернуть'}
-          </span>
-          <svg 
-            class={`w-6 h-6 text-gray-400 transition-transform ${isExpanded.value ? 'rotate-180' : ''}`}
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <button
+          type="button"
+          onClick={openFullscreen}
+          class="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors text-sm font-medium"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
           </svg>
-        </div>
-      </button>
+          <span class="hidden sm:inline">{t.openFullscreen}</span>
+        </button>
+      </div>
 
-      {/* Expandable content */}
-      {isExpanded.value && (
-        <div class="border-t border-dark-600">
-          {/* Source selector */}
-          {tourData.value.available_sources.length > 1 && (
-            <div class="p-4 bg-dark-700/50 border-b border-dark-600">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm text-gray-400">Источник:</span>
-                {tourData.value.available_sources.map((source) => (
-                  <button
-                    key={source}
-                    type="button"
-                    onClick={() => {
-                      selectedSource.value = source;
-                      iframeLoading.value = true;
-                    }}
-                    class={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                      selectedSource.value === source
-                        ? 'bg-cyber-500 text-dark-900 font-medium'
-                        : 'bg-dark-600 text-gray-300 hover:bg-dark-500'
-                    }`}
-                  >
-                    {getSourceLabel(source)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Player */}
-          {currentTour && (
-            <div class="relative">
-              {/* Loading overlay */}
-              {iframeLoading.value && (
-                <div class="absolute inset-0 bg-dark-800 flex items-center justify-center z-10">
-                  <div class="text-center">
-                    <div class="animate-spin text-4xl mb-2">🔄</div>
-                    <p class="text-gray-400">Загрузка панорамы...</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Iframe */}
-              <iframe
-                src={currentTour.url}
-                class="w-full h-[400px] md:h-[500px] border-0"
-                allowFullScreen
-                loading="lazy"
-                onLoad={() => { iframeLoading.value = false; }}
-              />
-            </div>
-          )}
-
-          {/* Footer info */}
-          <div class="p-4 bg-dark-700/30 border-t border-dark-600">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-              {currentTour?.address && (
-                <div class="flex items-center gap-2 text-sm text-gray-400">
-                  <span>📍</span>
-                  <span>{currentTour.address}</span>
-                </div>
-              )}
-              
-              <div class="flex flex-wrap gap-2">
-                {currentTour && (
-                  <a
-                    href={currentTour.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-dark-600 text-gray-300 rounded-lg text-sm hover:bg-dark-500 transition-colors"
-                  >
-                    🔗 Открыть в новой вкладке
-                  </a>
-                )}
-                
-                {currentTour?.latitude && currentTour?.longitude && (
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${currentTour.latitude},${currentTour.longitude}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-dark-600 text-gray-300 rounded-lg text-sm hover:bg-dark-500 transition-colors"
-                  >
-                    🗺️ На карте
-                  </a>
-                )}
-              </div>
+      {/* Встроенная панорама */}
+      <div class="relative">
+        {iframeLoading.value && (
+          <div class="absolute inset-0 bg-dark-800 flex items-center justify-center z-10">
+            <div class="text-center">
+              <div class="animate-spin text-4xl mb-2">🔄</div>
+              <p class="text-gray-400">{t.loading}</p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        <iframe
+          src={getStreetViewEmbedUrl()}
+          class="w-full h-[400px] md:h-[500px] border-0"
+          allowFullScreen
+          loading="lazy"
+          onLoad={() => { iframeLoading.value = false; }}
+          style="min-height: 400px;"
+        />
+      </div>
+
+      {/* Footer с подсказкой */}
+      <div class="p-3 bg-dark-700/30 border-t border-dark-600 text-center">
+        <p class="text-xs text-gray-500">
+          {t.hint}
+        </p>
+      </div>
     </section>
   );
 }

@@ -41,15 +41,15 @@ interface ButtonProps {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-500',
+    'bg-cyber-500 text-dark-900 hover:bg-cyber-400 active:bg-cyber-600 focus:ring-cyber-500',
   secondary:
-    'bg-gray-100 text-gray-900 hover:bg-gray-200 active:bg-gray-300 focus:ring-gray-500',
+    'bg-dark-700 text-gray-200 hover:bg-dark-600 active:bg-dark-500 focus:ring-dark-500',
   outline:
-    'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
+    'border-2 border-dark-600 text-gray-300 hover:border-dark-500 hover:bg-dark-700 focus:ring-dark-500',
   ghost:
-    'text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-500',
+    'text-gray-400 hover:bg-dark-700 hover:text-white focus:ring-dark-500',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500',
+    'bg-red-600 text-white hover:bg-red-500 active:bg-red-700 focus:ring-red-500',
 };
 
 /**

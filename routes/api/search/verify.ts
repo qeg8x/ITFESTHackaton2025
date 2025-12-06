@@ -6,6 +6,7 @@
 import { Handlers } from '$fresh/server.ts';
 import { logger } from '../../../src/utils/logger.ts';
 import { verifyUniversityWithAI } from '../../../src/services/search.service.ts';
+import { query } from '../../../src/config/database.ts';
 
 /**
  * Получить IP клиента
@@ -73,6 +74,60 @@ export const handler: Handlers = {
         throw new Error('No result from AI');
       }
 
+      // Проверяем, есть ли университет с таким website в базе
+      let existingUniversity = null;
+      if (result.found && result.website) {
+        try {
+          // Нормализуем URL для сравнения
+          const normalizeUrl = (url: string) => {
+            try {
+              const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
+              return parsed.hostname.replace(/^www\./, '').toLowerCase();
+            } catch {
+              return url.toLowerCase().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
+            }
+          };
+
+          const websiteHost = normalizeUrl(result.website);
+          
+          // Ищем в базе по совпадению домена
+          const dbResult = await query<{
+            id: string;
+            name: string;
+            country: string;
+            city: string;
+            website_url: string;
+          }>(
+            `SELECT id, name, country, city, website_url 
+             FROM universities 
+             WHERE is_active = true 
+             AND (
+               website_url ILIKE $1 
+               OR website_url ILIKE $2 
+               OR website_url ILIKE $3
+               OR website_url ILIKE $4
+             )
+             LIMIT 1`,
+            [
+              `%${websiteHost}%`,
+              `%www.${websiteHost}%`,
+              `https://${websiteHost}%`,
+              `https://www.${websiteHost}%`,
+            ]
+          );
+
+          if (dbResult.length > 0) {
+            existingUniversity = dbResult[0];
+            logger.info('Found existing university by website', { 
+              website: result.website, 
+              existingId: existingUniversity.id 
+            });
+          }
+        } catch (dbErr) {
+          logger.error('Failed to check existing university', { error: dbErr });
+        }
+      }
+
       return new Response(JSON.stringify({
         query: name,
         // Базовые поля
@@ -96,6 +151,8 @@ export const handler: Handlers = {
         rankings: result.rankings,
         scholarships: result.scholarships,
         tuition: result.tuition,
+        // Существующий университет в БД
+        existing_university: existingUniversity,
         took_ms: Date.now() - startTime,
       }), {
         status: 200,

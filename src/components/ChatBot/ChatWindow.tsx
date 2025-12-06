@@ -156,12 +156,12 @@ export const ChatWindow = ({ language = 'ru' }: ChatWindowProps) => {
   };
 
   return (
-    <div class="flex flex-col h-full bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div class="flex flex-col h-full bg-dark-800 rounded-xl border border-dark-600 overflow-hidden">
       {/* Header */}
       <ChatHeader onClear={handleClear} language={language} />
 
       {/* Messages */}
-      <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-dark-900">
         {messages.value.map((msg, i) => (
           <MessageBubble key={i} message={msg} />
         ))}

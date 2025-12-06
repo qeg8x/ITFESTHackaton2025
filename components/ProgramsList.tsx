@@ -26,11 +26,11 @@ const formatDegreeLevel = (level: string): string => {
  */
 const getDegreeBadgeColor = (level: string): string => {
   const colors: Record<string, string> = {
-    Bachelor: 'bg-blue-100 text-blue-800',
-    Master: 'bg-purple-100 text-purple-800',
-    PhD: 'bg-amber-100 text-amber-800',
+    Bachelor: 'bg-cyber-500/20 text-cyber-400 border border-cyber-500/30',
+    Master: 'bg-neon-500/20 text-neon-400 border border-neon-500/30',
+    PhD: 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
   };
-  return colors[level] ?? 'bg-gray-100 text-gray-800';
+  return colors[level] ?? 'bg-dark-600 text-gray-300 border border-dark-500';
 };
 
 /**
@@ -49,7 +49,7 @@ const formatTuition = (tuition?: { amount?: number | null; currency?: string }):
 export const ProgramsList = ({ programs, compact = false }: ProgramsListProps) => {
   if (!programs || programs.length === 0) {
     return (
-      <div class="text-center py-8 text-gray-500">
+      <div class="text-center py-8 text-gray-400">
         <p>Информация о программах недоступна</p>
       </div>
     );
@@ -62,12 +62,12 @@ export const ProgramsList = ({ programs, compact = false }: ProgramsListProps) =
         {programs.map((program) => (
           <div
             key={program.id}
-            class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+            class="border border-dark-600 bg-dark-700/50 rounded-lg p-4 hover:border-cyber-500/50 transition-colors"
           >
             <div class="flex items-start justify-between gap-2">
               <div>
-                <h4 class="font-medium text-gray-900">{program.name}</h4>
-                <p class="text-sm text-gray-600 mt-1">
+                <h4 class="font-medium text-white">{program.name}</h4>
+                <p class="text-sm text-gray-400 mt-1">
                   {program.duration_years} года · {program.language}
                 </p>
               </div>
@@ -76,7 +76,7 @@ export const ProgramsList = ({ programs, compact = false }: ProgramsListProps) =
               </span>
             </div>
             {program.tuition && (
-              <p class="text-sm text-gray-600 mt-2">
+              <p class="text-sm text-gray-400 mt-2">
                 💰 {formatTuition(program.tuition)} / год
               </p>
             )}
@@ -91,33 +91,33 @@ export const ProgramsList = ({ programs, compact = false }: ProgramsListProps) =
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead>
-          <tr class="border-b border-gray-200">
-            <th class="text-left py-3 px-4 font-medium text-gray-600">Программа</th>
-            <th class="text-left py-3 px-4 font-medium text-gray-600">Уровень</th>
-            <th class="text-left py-3 px-4 font-medium text-gray-600">Срок</th>
-            <th class="text-left py-3 px-4 font-medium text-gray-600">Язык</th>
-            <th class="text-right py-3 px-4 font-medium text-gray-600">Стоимость</th>
+          <tr class="border-b border-dark-600">
+            <th class="text-left py-3 px-4 font-medium text-gray-400">Программа</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-400">Уровень</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-400">Срок</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-400">Язык</th>
+            <th class="text-right py-3 px-4 font-medium text-gray-400">Стоимость</th>
           </tr>
         </thead>
         <tbody>
           {programs.map((program) => (
             <tr
               key={program.id}
-              class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              class="border-b border-dark-700 hover:bg-dark-700/50 transition-colors"
             >
               <td class="py-3 px-4">
-                <span class="font-medium text-gray-900">{program.name}</span>
+                <span class="font-medium text-white">{program.name}</span>
               </td>
               <td class="py-3 px-4">
                 <span class={`px-2 py-1 text-xs font-medium rounded-full ${getDegreeBadgeColor(program.degree_level)}`}>
                   {formatDegreeLevel(program.degree_level)}
                 </span>
               </td>
-              <td class="py-3 px-4 text-gray-600">
+              <td class="py-3 px-4 text-gray-300">
                 {program.duration_years} {program.duration_years === 1 ? 'год' : 'года'}
               </td>
-              <td class="py-3 px-4 text-gray-600">{program.language}</td>
-              <td class="py-3 px-4 text-right text-gray-600">
+              <td class="py-3 px-4 text-gray-300">{program.language}</td>
+              <td class="py-3 px-4 text-right text-gray-300">
                 {formatTuition(program.tuition)}
               </td>
             </tr>
@@ -128,14 +128,14 @@ export const ProgramsList = ({ programs, compact = false }: ProgramsListProps) =
       {/* Мобильная версия */}
       <div class="md:hidden space-y-3 mt-4">
         {programs.map((program) => (
-          <div key={program.id} class="bg-gray-50 rounded-lg p-4">
+          <div key={program.id} class="bg-dark-700/50 border border-dark-600 rounded-lg p-4">
             <div class="flex items-start justify-between">
-              <h4 class="font-medium text-gray-900">{program.name}</h4>
+              <h4 class="font-medium text-white">{program.name}</h4>
               <span class={`px-2 py-1 text-xs font-medium rounded-full ${getDegreeBadgeColor(program.degree_level)}`}>
                 {formatDegreeLevel(program.degree_level)}
               </span>
             </div>
-            <div class="mt-2 text-sm text-gray-600 space-y-1">
+            <div class="mt-2 text-sm text-gray-400 space-y-1">
               <p>📅 {program.duration_years} года</p>
               <p>🌐 {program.language}</p>
               {program.tuition && <p>💰 {formatTuition(program.tuition)}</p>}

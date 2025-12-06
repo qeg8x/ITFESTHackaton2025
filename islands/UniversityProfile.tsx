@@ -6,6 +6,7 @@ import { ProfileSkeleton } from '../components/Loading.tsx';
 import { ErrorMessage } from '../components/ErrorMessage.tsx';
 import { UniversityMapStatic } from '../src/components/UniversityMap.tsx';
 import Tour3DSection from './Tour3DSection.tsx';
+import { LanguageProvider, useLanguage } from '../src/contexts/LanguageContext.tsx';
 
 /**
  * Props для профиля университета
@@ -18,12 +19,24 @@ interface UniversityProfileProps {
 }
 
 /**
- * Компонент полного профиля университета
+ * Wrapper с LanguageProvider для island
  */
-export default function UniversityProfile({
+export default function UniversityProfile(props: UniversityProfileProps) {
+  return (
+    <LanguageProvider>
+      <UniversityProfileInner {...props} />
+    </LanguageProvider>
+  );
+}
+
+/**
+ * Внутренний компонент профиля университета
+ */
+function UniversityProfileInner({
   universityId,
   initialData,
 }: UniversityProfileProps) {
+  const { t, language } = useLanguage();
   const profile = useSignal<University | null>(initialData ?? null);
   const isLoading = useSignal(!initialData);
   const error = useSignal<string | null>(null);
@@ -84,10 +97,10 @@ export default function UniversityProfile({
   return (
     <div class="space-y-6">
       {/* Header */}
-      <section class="bg-white rounded-xl shadow-sm p-6">
+      <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
         <div class="flex flex-col md:flex-row items-start gap-6">
           {/* Logo */}
-          <div class="w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div class="w-24 h-24 bg-gradient-to-br from-cyber-500/20 to-neon-500/20 rounded-xl flex items-center justify-center flex-shrink-0 border border-dark-600">
             {p.logo_url ? (
               <img src={p.logo_url} alt={p.name} class="w-20 h-20 object-contain" />
             ) : (
@@ -97,14 +110,14 @@ export default function UniversityProfile({
 
           {/* Basic Info */}
           <div class="flex-1">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
               {p.name}
             </h1>
             {p.name_en && (
-              <p class="text-gray-500 mb-3">{p.name_en}</p>
+              <p class="text-gray-400 mb-3">{p.name_en}</p>
             )}
             <div class="flex flex-wrap gap-3 text-sm">
-              <span class="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full">
+              <span class="inline-flex items-center gap-1 px-3 py-1 bg-dark-700 text-gray-300 rounded-full border border-dark-600">
                 📍 {p.city}, {p.country}
               </span>
               {p.website_url && (
@@ -112,9 +125,9 @@ export default function UniversityProfile({
                   href={p.website_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                  class="inline-flex items-center gap-1 px-3 py-1 bg-cyber-500/20 text-cyber-400 rounded-full hover:bg-cyber-500/30 transition-colors border border-cyber-500/30"
                 >
-                  🌐 Сайт университета
+                  🌐 {t('university.website')}
                 </a>
               )}
             </div>
@@ -125,7 +138,7 @@ export default function UniversityProfile({
             <div class="flex flex-col items-end gap-2">
               {p.ratings.slice(0, 2).map((rating, i) => (
                 <div key={i} class="text-right">
-                  <div class="text-2xl font-bold text-blue-600">#{rating.rank}</div>
+                  <div class="text-2xl font-bold text-cyber-400">#{rating.rank}</div>
                   <div class="text-xs text-gray-500">{rating.source} {rating.year}</div>
                 </div>
               ))}
@@ -136,13 +149,13 @@ export default function UniversityProfile({
 
       {/* Description */}
       {p.description && (
-        <section class="bg-white rounded-xl shadow-sm p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Об университете</h2>
-          <p class="text-gray-700 leading-relaxed">{p.description}</p>
+        <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+          <h2 class="text-xl font-semibold text-white mb-4">{t('profile.about')}</h2>
+          <p class="text-gray-300 leading-relaxed">{p.description}</p>
           {p.mission && (
-            <div class="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <h3 class="font-medium text-blue-900 mb-1">Миссия</h3>
-              <p class="text-blue-800">{p.mission}</p>
+            <div class="mt-4 p-4 bg-cyber-500/10 rounded-lg border-l-4 border-cyber-500">
+              <h3 class="font-medium text-cyber-400 mb-1">{t('university.mission')}</h3>
+              <p class="text-gray-300">{p.mission}</p>
             </div>
           )}
         </section>
@@ -150,9 +163,9 @@ export default function UniversityProfile({
 
       {/* Programs */}
       {p.programs && p.programs.length > 0 && (
-        <section class="bg-white rounded-xl shadow-sm p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">
-            Образовательные программы
+        <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+          <h2 class="text-xl font-semibold text-white mb-4">
+            {t('university.educationalPrograms')}
             <span class="ml-2 text-sm font-normal text-gray-500">
               ({p.programs.length})
             </span>
@@ -164,20 +177,20 @@ export default function UniversityProfile({
       <div class="grid md:grid-cols-2 gap-6">
         {/* Admissions */}
         {p.admissions && (
-          <section class="bg-white rounded-xl shadow-sm p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-              📋 Поступление
+          <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+            <h2 class="text-xl font-semibold text-white mb-4">
+              📋 {t('profile.admissions')}
             </h2>
             {p.admissions.requirements && (
               <div class="mb-4">
-                <h3 class="font-medium text-gray-700 mb-2">Требования</h3>
-                <p class="text-gray-600">{p.admissions.requirements}</p>
+                <h3 class="font-medium text-gray-300 mb-2">{t('university.requirements')}</h3>
+                <p class="text-gray-400">{p.admissions.requirements}</p>
               </div>
             )}
             {p.admissions.start_date && (
               <div>
-                <h3 class="font-medium text-gray-700 mb-2">Начало приема</h3>
-                <p class="text-gray-600">{p.admissions.start_date}</p>
+                <h3 class="font-medium text-gray-300 mb-2">{t('university.deadline')}</h3>
+                <p class="text-gray-400">{p.admissions.start_date}</p>
               </div>
             )}
           </section>
@@ -185,15 +198,15 @@ export default function UniversityProfile({
 
         {/* Tuition */}
         {p.tuition && p.tuition.amount != null && (
-          <section class="bg-white rounded-xl shadow-sm p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">
-              💰 Стоимость обучения
+          <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+            <h2 class="text-xl font-semibold text-white mb-4">
+              💰 {t('university.tuitionFee')}
             </h2>
-            <div class="text-3xl font-bold text-green-600">
+            <div class="text-3xl font-bold text-neon-400">
               {new Intl.NumberFormat('ru-RU').format(p.tuition.amount)} {p.tuition.currency ?? 'USD'}
             </div>
             <p class="text-gray-500 mt-1">
-              {p.tuition.per_year ? 'в год' : 'за весь период'}
+              {p.tuition.per_year ? t('university.perYear') : t('programs.duration')}
             </p>
           </section>
         )}
@@ -201,21 +214,21 @@ export default function UniversityProfile({
 
       {/* Scholarships */}
       {p.scholarships && p.scholarships.length > 0 && (
-        <section class="bg-white rounded-xl shadow-sm p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">
-            🎁 Стипендии и гранты
+        <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+          <h2 class="text-xl font-semibold text-white mb-4">
+            🎁 {t('university.scholarshipsAndGrants')}
           </h2>
           <div class="grid md:grid-cols-2 gap-4">
             {p.scholarships.map((scholarship, i) => (
-              <div key={i} class="border border-gray-200 rounded-lg p-4">
-                <h3 class="font-medium text-gray-900">{scholarship.name}</h3>
+              <div key={i} class="border border-dark-600 bg-dark-700/50 rounded-lg p-4">
+                <h3 class="font-medium text-white">{scholarship.name}</h3>
                 {scholarship.amount && (
-                  <p class="text-green-600 font-semibold mt-1">
-                    {scholarship.amount}% покрытие
+                  <p class="text-neon-400 font-semibold mt-1">
+                    {scholarship.amount}% {t('university.coverage')}
                   </p>
                 )}
                 {scholarship.description && (
-                  <p class="text-gray-600 text-sm mt-2">{scholarship.description}</p>
+                  <p class="text-gray-400 text-sm mt-2">{scholarship.description}</p>
                 )}
               </div>
             ))}
@@ -225,41 +238,41 @@ export default function UniversityProfile({
 
       {/* Contacts */}
       {p.contacts && (p.contacts.email || p.contacts.phone || p.contacts.address) && (
-        <section class="bg-white rounded-xl shadow-sm p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">
-            📞 Контакты
+        <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
+          <h2 class="text-xl font-semibold text-white mb-4">
+            📞 {t('profile.contacts')}
           </h2>
           <div class="grid md:grid-cols-3 gap-4">
             {p.contacts.email && (
               <a
                 href={`mailto:${p.contacts.email}`}
-                class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center gap-3 p-3 bg-dark-700 rounded-lg hover:bg-dark-600 transition-colors border border-dark-600"
               >
                 <span class="text-xl">✉️</span>
                 <div>
-                  <div class="text-xs text-gray-500">Email</div>
-                  <div class="text-blue-600">{p.contacts.email}</div>
+                  <div class="text-xs text-gray-500">{t('profile.email')}</div>
+                  <div class="text-cyber-400">{p.contacts.email}</div>
                 </div>
               </a>
             )}
             {p.contacts.phone && (
               <a
                 href={`tel:${p.contacts.phone}`}
-                class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center gap-3 p-3 bg-dark-700 rounded-lg hover:bg-dark-600 transition-colors border border-dark-600"
               >
                 <span class="text-xl">📱</span>
                 <div>
-                  <div class="text-xs text-gray-500">Телефон</div>
-                  <div class="text-blue-600">{p.contacts.phone}</div>
+                  <div class="text-xs text-gray-500">{t('profile.phone')}</div>
+                  <div class="text-cyber-400">{p.contacts.phone}</div>
                 </div>
               </a>
             )}
             {p.contacts.address && (
-              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="flex items-center gap-3 p-3 bg-dark-700 rounded-lg border border-dark-600">
                 <span class="text-xl">🏢</span>
                 <div>
-                  <div class="text-xs text-gray-500">Адрес</div>
-                  <div class="text-gray-700">{p.contacts.address}</div>
+                  <div class="text-xs text-gray-500">{t('profile.address')}</div>
+                  <div class="text-gray-300">{p.contacts.address}</div>
                 </div>
               </div>
             )}
@@ -268,11 +281,22 @@ export default function UniversityProfile({
       )}
 
       {/* 3D Tour */}
-      <Tour3DSection universityId={universityId} universityName={p.name} />
+      <Tour3DSection 
+        universityId={universityId} 
+        universityName={p.name}
+        latitude={p.latitude}
+        longitude={p.longitude}
+        translations={{
+          title: t('streetView.title'),
+          openFullscreen: t('streetView.openFullscreen'),
+          loading: t('streetView.loading'),
+          hint: t('streetView.hint'),
+        }}
+      />
 
       {/* Map */}
       {p.latitude && p.longitude && (
-        <section class="bg-white rounded-xl shadow-sm p-6">
+        <section class="bg-dark-800 rounded-xl border border-dark-600 p-6">
           <UniversityMapStatic
             latitude={p.latitude}
             longitude={p.longitude}
@@ -285,7 +309,7 @@ export default function UniversityProfile({
       {/* Last updated */}
       {p.updated_at && (
         <div class="text-center text-sm text-gray-400">
-          Обновлено: {new Date(p.updated_at).toLocaleDateString('ru-RU')}
+          {t('common.lastUpdated')}: {new Date(p.updated_at).toLocaleDateString(language.value === 'ru' ? 'ru-RU' : language.value === 'kk' ? 'kk-KZ' : 'en-US')}
         </div>
       )}
     </div>

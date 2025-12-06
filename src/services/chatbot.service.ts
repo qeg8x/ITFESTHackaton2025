@@ -44,23 +44,6 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 1 минута
 const responseCache = new Map<string, { response: string; timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60; // 1 час
 
-/**
- * Языковые настройки
- */
-const LANGUAGE_CONFIG: Record<string, { name: string; greeting: string }> = {
-  ru: {
-    name: 'Russian',
-    greeting: 'Привет! Я помощник по выбору университета. Чем могу помочь?',
-  },
-  kk: {
-    name: 'Kazakh',
-    greeting: 'Сәлем! Мен университет таңдау бойынша көмекшімін. Қалай көмектесе аламын?',
-  },
-  en: {
-    name: 'English',
-    greeting: 'Hello! I\'m a university advisor assistant. How can I help you?',
-  },
-};
 
 /**
  * Проверить rate limit
@@ -104,38 +87,49 @@ export const validateMessage = (message: string): { valid: boolean; error?: stri
 };
 
 /**
+ * Универсальный промпт с автоопределением языка
+ */
+const SYSTEM_PROMPT = `You are a friendly AI university advisor assistant.
+
+CRITICAL LANGUAGE RULE:
+- ALWAYS detect the language of the user's message and respond in THE SAME LANGUAGE.
+- If user writes in Russian → respond in Russian
+- If user writes in Kazakh → respond in Kazakh  
+- If user writes in English → respond in English
+- If user writes in any other language → respond in that language
+
+TOPIC RULES:
+1. ONLY answer questions about universities, education, admissions, scholarships, study programs.
+2. If the question is NOT about education, politely redirect:
+   - Russian: "Я специализируюсь на вопросах образования. Могу помочь с выбором университета или рассказать о поступлении!"
+   - Kazakh: "Мен білім беру мәселелеріне маманданамын. Университет таңдауға көмектесе аламын!"
+   - English: "I specialize in education topics. I can help you choose a university or tell you about admissions!"
+
+STYLE RULES:
+1. Be friendly, supportive, and encouraging.
+2. Keep answers brief (1-3 paragraphs, max 400 characters).
+3. For detailed info, suggest searching in our database.`;
+
+/**
  * Построить промпт для Ollama
  */
 const buildChatPrompt = (
   message: string,
   history: ChatMessage[],
-  language: string
+  _language: string
 ): string => {
-  const langConfig = LANGUAGE_CONFIG[language] || LANGUAGE_CONFIG.en;
-
   // Форматировать историю
   const historyText = history
     .slice(-10) // Последние 10 сообщений
     .map((msg) => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
     .join('\n');
 
-  return `You are a helpful university advisor bot, acting as a knowledgeable student counselor.
-Your goal is to help users find the right university for them.
-
-CRITICAL RULES:
-1. You ONLY answer questions about universities, education, studying, programs, admissions, scholarships.
-2. If user asks about anything NOT related to education (politics, sports, cooking, entertainment, etc),
-   respond: "I specialize in university and education topics. Would you like to know about universities, programs, or admissions?"
-3. You speak in ${langConfig.name}.
-4. You are friendly, supportive, and encouraging.
-5. You provide practical advice about studying, choosing universities, applications.
-6. Keep responses concise (1-3 paragraphs, max 400 characters).
-7. If you don't know specific details, suggest searching in our database.
+  return `${SYSTEM_PROMPT}
 
 ${historyText ? `Conversation history:\n${historyText}\n` : ''}
 User message: "${message}"
 
-Respond naturally and helpfully in ${langConfig.name}:`;
+IMPORTANT: Detect the language of the user's message above and respond in THE SAME LANGUAGE:`;
 };
 
 /**

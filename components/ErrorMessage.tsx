@@ -24,9 +24,9 @@ export const ErrorMessage = ({
 }: ErrorMessageProps) => {
   const content = (
     <div class="text-center p-6">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-4">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
         <svg
-          class="w-8 h-8 text-red-600"
+          class="w-8 h-8 text-red-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -39,13 +39,13 @@ export const ErrorMessage = ({
           />
         </svg>
       </div>
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-      <p class="text-gray-600 mb-4">{message}</p>
+      <h3 class="text-lg font-semibold text-white mb-2">{title}</h3>
+      <p class="text-gray-400 mb-4">{message}</p>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
-          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          class="px-4 py-2 bg-cyber-500 text-dark-900 font-medium rounded-lg hover:bg-cyber-400 transition-colors"
         >
           Попробовать снова
         </button>
@@ -62,7 +62,7 @@ export const ErrorMessage = ({
   }
 
   return (
-    <div class="bg-red-50 border border-red-200 rounded-lg">
+    <div class="bg-red-500/10 border border-red-500/30 rounded-lg">
       {content}
     </div>
   );
@@ -77,7 +77,7 @@ export const NotFound = ({
   message?: string;
 }) => (
   <div class="text-center p-6">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-dark-700 mb-4">
       <svg
         class="w-8 h-8 text-gray-400"
         fill="none"
@@ -92,8 +92,8 @@ export const NotFound = ({
         />
       </svg>
     </div>
-    <h3 class="text-lg font-semibold text-gray-900 mb-2">Не найдено</h3>
-    <p class="text-gray-600">{message}</p>
+    <h3 class="text-lg font-semibold text-white mb-2">Не найдено</h3>
+    <p class="text-gray-400">{message}</p>
   </div>
 );
 

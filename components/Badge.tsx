@@ -58,30 +58,30 @@ const colorStylesFilled: Record<BadgeColor, string> = {
  * Стили цветов (soft)
  */
 const colorStylesSoft: Record<BadgeColor, string> = {
-  gray: 'bg-gray-100 text-gray-700',
-  blue: 'bg-blue-100 text-blue-700',
-  green: 'bg-green-100 text-green-700',
-  yellow: 'bg-yellow-100 text-yellow-700',
-  red: 'bg-red-100 text-red-700',
-  purple: 'bg-purple-100 text-purple-700',
-  pink: 'bg-pink-100 text-pink-700',
-  indigo: 'bg-indigo-100 text-indigo-700',
-  cyan: 'bg-cyan-100 text-cyan-700',
+  gray: 'bg-gray-500/20 text-gray-300',
+  blue: 'bg-blue-500/20 text-blue-400',
+  green: 'bg-green-500/20 text-green-400',
+  yellow: 'bg-yellow-500/20 text-yellow-400',
+  red: 'bg-red-500/20 text-red-400',
+  purple: 'bg-purple-500/20 text-purple-400',
+  pink: 'bg-pink-500/20 text-pink-400',
+  indigo: 'bg-indigo-500/20 text-indigo-400',
+  cyan: 'bg-cyan-500/20 text-cyan-400',
 };
 
 /**
  * Стили цветов (outline)
  */
 const colorStylesOutline: Record<BadgeColor, string> = {
-  gray: 'border-gray-300 text-gray-600',
-  blue: 'border-blue-300 text-blue-600',
-  green: 'border-green-300 text-green-600',
-  yellow: 'border-yellow-300 text-yellow-600',
-  red: 'border-red-300 text-red-600',
-  purple: 'border-purple-300 text-purple-600',
-  pink: 'border-pink-300 text-pink-600',
-  indigo: 'border-indigo-300 text-indigo-600',
-  cyan: 'border-cyan-300 text-cyan-600',
+  gray: 'border-gray-500 text-gray-400',
+  blue: 'border-blue-500 text-blue-400',
+  green: 'border-green-500 text-green-400',
+  yellow: 'border-yellow-500 text-yellow-400',
+  red: 'border-red-500 text-red-400',
+  purple: 'border-purple-500 text-purple-400',
+  pink: 'border-pink-500 text-pink-400',
+  indigo: 'border-indigo-500 text-indigo-400',
+  cyan: 'border-cyan-500 text-cyan-400',
 };
 
 /**

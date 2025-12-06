@@ -51,7 +51,7 @@ export const ChatInput = ({
   };
 
   return (
-    <div class="border-t border-gray-200 p-3 bg-white">
+    <div class="border-t border-dark-600 p-3 bg-dark-800">
       <div class="flex items-end gap-2">
         <textarea
           ref={textareaRef}
@@ -61,7 +61,7 @@ export const ChatInput = ({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          class="flex-1 px-4 py-2.5 border border-gray-200 rounded-2xl resize-none outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all disabled:bg-gray-50 disabled:text-gray-400 text-sm"
+          class="flex-1 px-4 py-2.5 border border-dark-600 bg-dark-700 rounded-2xl resize-none outline-none focus:border-cyber-500 focus:ring-2 focus:ring-cyber-500/20 transition-all disabled:bg-dark-800 disabled:text-gray-500 text-sm text-white placeholder:text-gray-500"
           style={{ maxHeight: '120px' }}
         />
 
@@ -71,8 +71,8 @@ export const ChatInput = ({
           disabled={disabled || !value.trim()}
           class={`p-2.5 rounded-full transition-all ${
             disabled || !value.trim()
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+              ? 'bg-dark-700 text-gray-500 cursor-not-allowed'
+              : 'bg-cyber-500 text-dark-900 hover:bg-cyber-400 shadow-sm'
           }`}
         >
           {disabled ? (
@@ -90,7 +90,7 @@ export const ChatInput = ({
         </button>
       </div>
 
-      <p class="text-xs text-gray-400 mt-2 text-center">
+      <p class="text-xs text-gray-500 mt-2 text-center">
         {language === 'ru'
           ? 'Enter — отправить, Shift+Enter — новая строка'
           : language === 'kk'

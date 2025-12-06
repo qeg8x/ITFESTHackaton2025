@@ -3,33 +3,37 @@
  * Встроенная админ-панель или редирект
  */
 
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
+
 /**
  * Tab контейнер для админ-панели
  * Предоставляет быстрый доступ к административным функциям
  */
 export const AdminTab = () => {
+  const { t } = useLanguage();
+  
   const adminFeatures = [
     {
-      title: 'Управление университетами',
-      description: 'Добавление, редактирование и удаление университетов',
+      titleKey: 'admin.universities',
+      descKey: 'admin.universitiesDesc',
       icon: '🏫',
       href: '/admin/universities',
     },
     {
-      title: 'Системные логи',
-      description: 'Просмотр логов системы и ошибок',
+      titleKey: 'admin.logs',
+      descKey: 'admin.logsDesc',
       icon: '📋',
       href: '/admin/logs',
     },
     {
-      title: 'Парсинг данных',
-      description: 'Запуск обновления данных университетов',
+      titleKey: 'admin.parser',
+      descKey: 'admin.parserDesc',
       icon: '🔄',
       href: '/admin/parser',
     },
     {
-      title: 'Настройки',
-      description: 'Конфигурация системы',
+      titleKey: 'admin.settings',
+      descKey: 'admin.settingsDesc',
       icon: '⚙️',
       href: '/admin/settings',
     },
@@ -40,10 +44,10 @@ export const AdminTab = () => {
       {/* Header */}
       <div class="bg-gradient-to-b from-dark-800 to-dark-900 py-8 px-4 text-center">
         <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
-          ⚙️ Админ-панель
+          ⚙️ {t('admin.title')}
         </h1>
         <p class="text-gray-400">
-          Управление данными и настройками системы
+          {t('admin.subtitle')}
         </p>
       </div>
 
@@ -54,9 +58,9 @@ export const AdminTab = () => {
           <div class="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl flex items-start gap-3">
             <span class="text-xl">⚠️</span>
             <div>
-              <p class="font-medium text-yellow-400">Требуется авторизация</p>
+              <p class="font-medium text-yellow-400">{t('admin.authRequired')}</p>
               <p class="text-sm text-yellow-500/80 mt-1">
-                Для доступа к административным функциям перейдите в полную версию админ-панели.
+                {t('admin.fullPanel')}
               </p>
             </div>
           </div>
@@ -75,9 +79,9 @@ export const AdminTab = () => {
                   </div>
                   <div class="flex-1">
                     <h3 class="font-semibold text-white group-hover:text-cyber-400 transition-colors">
-                      {feature.title}
+                      {t(feature.titleKey)}
                     </h3>
-                    <p class="text-sm text-gray-500 mt-1">{feature.description}</p>
+                    <p class="text-sm text-gray-500 mt-1">{t(feature.descKey)}</p>
                   </div>
                   <span class="text-gray-500 group-hover:text-cyber-400 transition-colors">
                     →
@@ -93,7 +97,7 @@ export const AdminTab = () => {
               href="/admin"
               class="inline-flex items-center gap-2 px-6 py-3 bg-cyber-500 text-dark-900 font-semibold rounded-xl hover:bg-cyber-400 hover:shadow-glow transition-all"
             >
-              <span>Открыть полную админ-панель</span>
+              <span>{t('admin.fullPanel')}</span>
               <span>→</span>
             </a>
           </div>

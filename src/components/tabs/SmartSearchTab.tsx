@@ -6,6 +6,7 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import UniversitySearch from '../../../islands/UniversitySearch.tsx';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 interface University {
   id: string;
@@ -20,6 +21,7 @@ interface University {
  * Tab контейнер для умного AI-поиска университетов
  */
 export const SmartSearchTab = () => {
+  const { t } = useLanguage();
   const universities = useSignal<University[]>([]);
   const loading = useSignal(true);
 
@@ -48,10 +50,10 @@ export const SmartSearchTab = () => {
         <div class="absolute inset-0 bg-grid opacity-50" />
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h1 class="text-2xl md:text-3xl font-bold text-white mb-3">
-            Найдите <span class="text-gradient">тот самый</span> университет
+            {t('search.title')}
           </h1>
           <p class="text-gray-400 mb-6 max-w-xl mx-auto">
-            Поиск в базе или добавление нового через AI
+            {t('search.subtitle')}
           </p>
           
           {/* Search Component */}
@@ -66,7 +68,7 @@ export const SmartSearchTab = () => {
         <div class="max-w-5xl mx-auto">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-lg font-semibold text-white flex items-center gap-2">
-              <span class="text-cyber-400">📚</span> Университеты в базе
+              <span class="text-cyber-400">📚</span> {t('base.title')}
               {!loading.value && (
                 <span class="ml-2 text-sm font-normal text-gray-500">
                   ({universities.value.length})
@@ -118,7 +120,7 @@ export const SmartSearchTab = () => {
           ) : (
             <div class="text-center py-12 text-gray-500">
               <span class="text-4xl">📭</span>
-              <p class="mt-4">База пуста. Используйте поиск выше для добавления университетов.</p>
+              <p class="mt-4">{t('common.noResults')}</p>
             </div>
           )}
         </div>
@@ -133,8 +135,8 @@ export const SmartSearchTab = () => {
                 <span class="text-xl">🔍</span>
               </div>
               <div class="text-left md:text-center">
-                <h3 class="font-medium text-sm text-white">Поиск</h3>
-                <p class="text-xs text-gray-500">В базе данных</p>
+                <h3 class="font-medium text-sm text-white">{t('howItWorks.search')}</h3>
+                <p class="text-xs text-gray-500">{t('howItWorks.searchDesc')}</p>
               </div>
             </div>
             <div class="flex items-center gap-3 md:flex-col md:gap-2">
@@ -142,8 +144,8 @@ export const SmartSearchTab = () => {
                 <span class="text-xl">🤖</span>
               </div>
               <div class="text-left md:text-center">
-                <h3 class="font-medium text-sm text-white">AI-проверка</h3>
-                <p class="text-xs text-gray-500">Если нет в базе</p>
+                <h3 class="font-medium text-sm text-white">{t('howItWorks.aiCheck')}</h3>
+                <p class="text-xs text-gray-500">{t('howItWorks.aiCheckDesc')}</p>
               </div>
             </div>
             <div class="flex items-center gap-3 md:flex-col md:gap-2">
@@ -151,8 +153,8 @@ export const SmartSearchTab = () => {
                 <span class="text-xl">➕</span>
               </div>
               <div class="text-left md:text-center">
-                <h3 class="font-medium text-sm text-white">Добавление</h3>
-                <p class="text-xs text-gray-500">Автоматический парсинг</p>
+                <h3 class="font-medium text-sm text-white">{t('howItWorks.add')}</h3>
+                <p class="text-xs text-gray-500">{t('howItWorks.addDesc')}</p>
               </div>
             </div>
           </div>

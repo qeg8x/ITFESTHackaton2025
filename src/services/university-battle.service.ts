@@ -229,7 +229,7 @@ const buildComparisonPrompt = (
   const uniAData = formatUniversityData(uniA);
   const uniBData = formatUniversityData(uniB);
 
-  return `You are an expert university analyst. Compare these two universities based on ALL the data provided below.
+  return `You are an expert university analyst and career advisor. Your task is to provide a COMPREHENSIVE comparison of two universities to help students make the best choice.
 
 CRITICAL: Use ONLY the actual data provided. Do NOT guess or make up information.
 
@@ -259,14 +259,20 @@ INSTRUCTIONS:
 1. For each criterion, analyze the actual data provided above
 2. Give scores 1-10 based on real data, not assumptions
 3. If data is missing for a criterion, score based on available related data
-4. Write explanations in ${langName}
+4. Write ALL text in ${langName}
 5. Be objective and fair
+6. IMPORTANT: Provide DETAILED explanations (2-3 sentences per criterion)
+7. IMPORTANT: The recommendation field must be VERY DETAILED (300-500 characters):
+   - Explain WHO should choose University A (what type of student, goals, priorities)
+   - Explain WHO should choose University B (what type of student, goals, priorities)
+   - Give specific advice based on career goals, budget, international aspirations
+   - Mention specific programs or features that stand out
 
 Return ONLY valid JSON in this exact format:
 {
   "criteria": [
-    { "name": "Academic Reputation", "scoreA": 8, "scoreB": 7, "winner": "A", "explanation": "Краткое объяснение на основе данных..." },
-    { "name": "Teaching Quality", "scoreA": 7, "scoreB": 8, "winner": "B", "explanation": "..." },
+    { "name": "Academic Reputation", "scoreA": 8, "scoreB": 7, "winner": "A", "explanation": "Детальное объяснение с конкретными фактами из данных. Упоминание рейтингов, достижений и аккредитаций..." },
+    { "name": "Teaching Quality", "scoreA": 7, "scoreB": 8, "winner": "B", "explanation": "Детальное объяснение качества преподавания, соотношения студентов и преподавателей..." },
     { "name": "Research Output", "scoreA": 8, "scoreB": 6, "winner": "A", "explanation": "..." },
     { "name": "International Diversity", "scoreA": 9, "scoreB": 5, "winner": "A", "explanation": "..." },
     { "name": "Cost Effectiveness", "scoreA": 6, "scoreB": 8, "winner": "B", "explanation": "..." },
@@ -275,9 +281,9 @@ Return ONLY valid JSON in this exact format:
     { "name": "Faculty Quality", "scoreA": 8, "scoreB": 7, "winner": "A", "explanation": "..." }
   ],
   "overallWinner": "A",
-  "strengthsA": ["сила 1", "сила 2", "сила 3"],
-  "strengthsB": ["сила 1", "сила 2", "сила 3"],
-  "recommendation": "Рекомендация для абитуриентов: кому подойдёт какой университет..."
+  "strengthsA": ["Детальная сила 1 с конкретикой", "Детальная сила 2", "Детальная сила 3", "Детальная сила 4"],
+  "strengthsB": ["Детальная сила 1 с конкретикой", "Детальная сила 2", "Детальная сила 3", "Детальная сила 4"],
+  "recommendation": "ПОДРОБНАЯ рекомендация (300-500 символов): Университет A подойдёт тем, кто... (конкретные цели, специальности, приоритеты). Университет B лучше выбрать тем, кто... (другие цели и приоритеты). Если ваш бюджет ограничен... Если вы планируете международную карьеру... Для технических специальностей рекомендуем... Для гуманитарных направлений..."
 }`;
 };
 
