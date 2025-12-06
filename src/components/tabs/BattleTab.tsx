@@ -110,13 +110,13 @@ export const BattleTab = () => {
     : [];
 
   return (
-    <div class="h-full flex flex-col bg-gradient-to-b from-purple-50 to-white">
+    <div class="h-full flex flex-col bg-dark-900">
       {/* Header */}
-      <div class="py-8 px-4 text-center">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+      <div class="py-8 px-4 text-center bg-gradient-to-b from-neon-500/10 to-transparent">
+        <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">
           ⚔️ {t('battle.title')}
         </h1>
-        <p class="text-gray-600">
+        <p class="text-gray-400">
           {t('battle.subtitle')}
         </p>
       </div>
@@ -192,11 +192,11 @@ export const BattleTab = () => {
                   }
                 }}
                 disabled={aiComparing.value}
-                class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-all"
+                class="px-6 py-3 bg-gradient-to-r from-neon-500 to-cyber-500 text-dark-900 rounded-xl font-semibold hover:shadow-glow-neon disabled:opacity-50 transition-all"
               >
                 {aiComparing.value ? (
                   <span class="flex items-center gap-2">
-                    <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div class="w-4 h-4 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" />
                     {t('common.loading')}
                   </span>
                 ) : (
@@ -208,14 +208,14 @@ export const BattleTab = () => {
 
           {/* AI Result */}
           {aiResult.value && (
-            <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
+            <div class="mt-6 bg-gradient-to-r from-neon-500/10 to-cyber-500/10 rounded-2xl p-6 border border-neon-500/30">
               <div class="text-center">
                 <span class="text-3xl">🏆</span>
-                <h3 class="text-xl font-bold text-gray-900 mt-2">
+                <h3 class="text-xl font-bold text-white mt-2">
                   {aiResult.value.winner}
                 </h3>
                 {aiResult.value.recommendation && (
-                  <p class="text-gray-600 mt-2">{aiResult.value.recommendation}</p>
+                  <p class="text-gray-400 mt-2">{aiResult.value.recommendation}</p>
                 )}
               </div>
             </div>
@@ -223,11 +223,11 @@ export const BattleTab = () => {
 
           {/* Comparison Results */}
           {uni1.value && uni2.value && (
-            <div class="mt-8 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <div class="bg-gradient-to-r from-blue-600 to-red-600 text-white text-center py-4">
+            <div class="mt-8 bg-dark-800 rounded-2xl border border-dark-600 overflow-hidden">
+              <div class="bg-gradient-to-r from-cyber-600 to-neon-600 text-white text-center py-4">
                 <h2 class="text-lg font-semibold">{t('battle.results')}</h2>
               </div>
-              <div class="divide-y divide-gray-100">
+              <div class="divide-y divide-dark-600">
                 {comparisons.map((comp) => (
                   <div
                     key={comp.category}
@@ -235,7 +235,7 @@ export const BattleTab = () => {
                   >
                     <div
                       class={`font-semibold ${
-                        comp.winner === 'uni1' ? 'text-blue-600' : 'text-gray-600'
+                        comp.winner === 'uni1' ? 'text-cyber-400' : 'text-gray-400'
                       }`}
                     >
                       {comp.uni1Value}
@@ -244,7 +244,7 @@ export const BattleTab = () => {
                     <div class="text-gray-500 font-medium">{comp.category}</div>
                     <div
                       class={`font-semibold ${
-                        comp.winner === 'uni2' ? 'text-red-600' : 'text-gray-600'
+                        comp.winner === 'uni2' ? 'text-neon-400' : 'text-gray-400'
                       }`}
                     >
                       {comp.uni2Value}
@@ -258,7 +258,7 @@ export const BattleTab = () => {
 
           {/* Empty State */}
           {(!uni1.value || !uni2.value) && (
-            <div class="mt-8 text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
+            <div class="mt-8 text-center py-12 bg-dark-800 rounded-2xl border border-dashed border-dark-600">
               <span class="text-4xl">⚔️</span>
               <p class="mt-4 text-gray-500">
                 {t('battle.selectBoth')}
@@ -286,7 +286,7 @@ interface UniversitySelectorProps {
 }
 
 /**
- * Компонент выбора университета для батла
+ * Компонент выбора университета для батла - тёмная тема
  */
 const UniversitySelector = ({
   label,
@@ -301,23 +301,24 @@ const UniversitySelector = ({
   onClear,
   color,
 }: UniversitySelectorProps) => {
-  const borderColor = color === 'blue' ? 'border-blue-500' : 'border-red-500';
-  const bgColor = color === 'blue' ? 'bg-blue-50' : 'bg-red-50';
+  const borderColor = color === 'blue' ? 'border-cyber-500' : 'border-neon-500';
+  const bgColor = color === 'blue' ? 'bg-cyber-500/10' : 'bg-neon-500/10';
+  const textColor = color === 'blue' ? 'text-cyber-400' : 'text-neon-400';
 
   if (selected) {
     return (
-      <div class={`p-6 bg-white rounded-2xl border-2 ${borderColor}`}>
+      <div class={`p-6 bg-dark-800 rounded-2xl border-2 ${borderColor}`}>
         <div class="flex items-start justify-between">
           <div>
-            <h3 class="font-semibold text-lg text-gray-900">{selected.name}</h3>
-            <p class="text-sm text-gray-600 mt-1">
+            <h3 class={`font-semibold text-lg ${textColor}`}>{selected.name}</h3>
+            <p class="text-sm text-gray-400 mt-1">
               📍 {selected.country}, {selected.city}
             </p>
           </div>
           <button
             type="button"
             onClick={onClear}
-            class="p-1 text-gray-400 hover:text-gray-600"
+            class="p-1 text-gray-500 hover:text-gray-300 transition-colors"
           >
             ✕
           </button>
@@ -332,13 +333,13 @@ const UniversitySelector = ({
 
   return (
     <div class={`p-6 ${bgColor} rounded-2xl border-2 border-dashed ${borderColor}`}>
-      <p class="text-sm font-medium text-gray-700 mb-3">{label}</p>
+      <p class="text-sm font-medium text-gray-300 mb-3">{label}</p>
       <input
         type="text"
         placeholder={searchPlaceholder}
         value={searchQuery}
         onInput={(e) => onSearchChange((e.target as HTMLInputElement).value)}
-        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"
+        class="w-full px-4 py-2.5 bg-dark-800 border border-dark-600 text-white rounded-lg focus:ring-2 focus:ring-cyber-500/20 focus:border-cyber-500 outline-none placeholder:text-gray-500 transition-all"
       />
       {searchQuery && filteredUniversities.length > 0 && (
         <div class="mt-3 space-y-2">
@@ -347,9 +348,9 @@ const UniversitySelector = ({
               key={uni.id}
               type="button"
               onClick={() => onSelect(uni)}
-              class="w-full text-left p-3 bg-white rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors"
+              class="w-full text-left p-3 bg-dark-700 rounded-lg hover:bg-dark-600 border border-dark-600 hover:border-cyber-500/50 transition-all"
             >
-              <p class="font-medium text-gray-900 text-sm">{uni.name}</p>
+              <p class="font-medium text-white text-sm">{uni.name}</p>
               <p class="text-xs text-gray-500">
                 {uni.country}, {uni.city}
               </p>

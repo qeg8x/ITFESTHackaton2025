@@ -7,6 +7,9 @@ import {
   NO_INFO, 
   type University, 
   type Program,
+  type UniversityThreeDTour,
+  type ThreeDTourSource,
+  type ThreeDTourProvider,
 } from '../types/university.ts';
 import type { UniversitySourceRow, UpdateStatus } from '../types/database.ts';
 import type { PoolClient } from 'postgres';
@@ -597,7 +600,77 @@ const validateAndNormalizeProfile = (
     merged.contacts = {};
   }
 
+  // Нормализовать 3D-тур
+  if (merged['3d_tour']) {
+    merged['3d_tour'] = normalizeThreeDTour(merged['3d_tour']);
+  }
+
   return merged;
+};
+
+/**
+ * Нормализовать структуру 3D-тура
+ */
+const normalizeThreeDTour = (
+  tour: Partial<UniversityThreeDTour>
+): UniversityThreeDTour => {
+  const sources: ThreeDTourProvider[] = [];
+  const normalizedTour: UniversityThreeDTour = {
+    available_sources: [],
+  };
+
+  const normalizeSource = (source?: ThreeDTourSource): ThreeDTourSource | undefined => {
+    if (!source) return undefined;
+    if (!isFinite(source.latitude) || !isFinite(source.longitude)) {
+      return undefined;
+    }
+    return {
+      source: source.source,
+      url: source.url,
+      latitude: clampLatitude(source.latitude),
+      longitude: clampLongitude(source.longitude),
+      address: source.address,
+      available: source.available ?? true,
+      last_validated: source.last_validated ? new Date(source.last_validated) : new Date(),
+    };
+  };
+
+  const google = normalizeSource(tour.google_maps);
+  const yandex = normalizeSource(tour.yandex_panorama);
+  const twogis = normalizeSource(tour.twogis);
+
+  if (google) {
+    normalizedTour.google_maps = google;
+    sources.push('google');
+  }
+  if (yandex) {
+    normalizedTour.yandex_panorama = yandex;
+    sources.push('yandex');
+  }
+  if (twogis) {
+    normalizedTour.twogis = twogis;
+    sources.push('2gis');
+  }
+
+  normalizedTour.available_sources = sources;
+  normalizedTour.primary_source = tour.primary_source && sources.includes(tour.primary_source)
+    ? tour.primary_source
+    : sources[0];
+  normalizedTour.last_updated = tour.last_updated ? new Date(tour.last_updated) : new Date();
+
+  return normalizedTour;
+};
+
+const clampLatitude = (value: number): number => {
+  if (value > 90) return 90;
+  if (value < -90) return -90;
+  return value;
+};
+
+const clampLongitude = (value: number): number => {
+  if (value > 180) return 180;
+  if (value < -180) return -180;
+  return value;
 };
 
 /**

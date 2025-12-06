@@ -75,7 +75,7 @@ export const Tabs = ({
       {/* Desktop Tabs */}
       <nav
         ref={tabsRef}
-        class="hidden md:flex items-center bg-white border-b border-gray-200"
+        class="hidden md:flex items-center bg-dark-800 border-b border-dark-600"
         role="tablist"
         tabIndex={0}
       >
@@ -91,20 +91,20 @@ export const Tabs = ({
       </nav>
 
       {/* Mobile Menu Button */}
-      <div class="md:hidden flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3">
-        <span class="font-medium text-gray-900">
+      <div class="md:hidden flex items-center justify-between bg-dark-800 border-b border-dark-600 px-4 py-3">
+        <span class="font-medium text-white">
           {TAB_ITEMS.find((tab) => tab.id === activeTab)?.icon}{' '}
           {t(TAB_ITEMS.find((tab) => tab.id === activeTab)?.labelKey || '')}
         </span>
         <button
           type="button"
           onClick={onMobileMenuToggle}
-          class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          class="p-2 rounded-lg hover:bg-dark-700 transition-colors"
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
         >
           <svg
-            class={`w-6 h-6 text-gray-600 transition-transform duration-200 ${
+            class={`w-6 h-6 text-gray-400 transition-transform duration-200 ${
               mobileMenuOpen ? 'rotate-180' : ''
             }`}
             fill="none"
@@ -127,7 +127,7 @@ export const Tabs = ({
           mobileMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <nav class="bg-white border-b border-gray-200 py-2 px-4 space-y-1">
+        <nav class="bg-dark-800 border-b border-dark-600 py-2 px-4 space-y-1">
           {TAB_ITEMS.map((tab) => (
             <button
               key={tab.id}
@@ -138,8 +138,8 @@ export const Tabs = ({
               }}
               class={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  ? 'bg-cyber-500/10 text-cyber-400 border border-cyber-500/30'
+                  : 'text-gray-400 hover:bg-dark-700 hover:text-white'
               }`}
             >
               <span class="text-xl">{tab.icon}</span>
@@ -160,7 +160,7 @@ interface TabButtonProps {
 }
 
 /**
- * Отдельная кнопка таба
+ * Отдельная кнопка таба - тёмная тема
  */
 const TabButton = ({ tab, label, isActive, onClick }: TabButtonProps) => (
   <button
@@ -168,18 +168,18 @@ const TabButton = ({ tab, label, isActive, onClick }: TabButtonProps) => (
     role="tab"
     aria-selected={isActive}
     onClick={onClick}
-    class={`relative flex-1 flex items-center justify-center gap-2 px-4 py-4 font-medium transition-all duration-200 border-r border-gray-100 last:border-r-0 ${
+    class={`relative flex-1 flex items-center justify-center gap-2 px-4 py-4 font-medium transition-all duration-200 border-r border-dark-600 last:border-r-0 ${
       isActive
-        ? 'text-blue-600 bg-blue-50/50'
-        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+        ? 'text-cyber-400 bg-cyber-500/10'
+        : 'text-gray-400 hover:text-white hover:bg-dark-700'
     }`}
   >
     <span class="text-lg">{tab.icon}</span>
     <span>{label}</span>
-    {/* Active indicator */}
+    {/* Active indicator - cyber glow */}
     <span
-      class={`absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 transition-all duration-300 ${
-        isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+      class={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyber-400 to-cyber-600 transition-all duration-300 ${
+        isActive ? 'opacity-100 scale-x-100 shadow-glow-sm' : 'opacity-0 scale-x-0'
       }`}
     />
   </button>

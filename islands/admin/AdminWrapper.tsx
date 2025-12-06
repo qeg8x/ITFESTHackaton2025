@@ -22,8 +22,8 @@ function AuthGate({ page, universityId }: Props) {
 
   if (isLoading) {
     return (
-      <div class="min-h-screen flex items-center justify-center bg-gray-50">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div class="min-h-screen flex items-center justify-center bg-dark-900">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyber-500"></div>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 /**
  * Глобальные стили для Цифровой университет
- * Tailwind CSS + кастомные стили
+ * Тёмная технологическая тема
  */
 
 /* Tailwind directives */
@@ -9,23 +9,24 @@
 @tailwind utilities;
 
 /* ========================================
-   Base Styles
+   Base Styles - Dark Tech Theme
    ======================================== */
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 min-h-screen;
+    @apply bg-dark-900 text-gray-100 min-h-screen;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-semibold tracking-tight text-white;
   }
 
   h1 {
@@ -41,21 +42,26 @@
   }
 
   p {
-    @apply leading-relaxed;
+    @apply leading-relaxed text-gray-300;
   }
 
   a {
     @apply transition-colors duration-200;
   }
 
-  /* Focus styles */
+  /* Focus styles - cyber glow */
   *:focus-visible {
-    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+    @apply outline-none ring-2 ring-cyber-500 ring-offset-2 ring-offset-dark-900;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-cyber-500/30 text-white;
   }
 }
 
 /* ========================================
-   Component Styles
+   Component Styles - Dark Tech Theme
    ======================================== */
 @layer components {
   /* Container */
@@ -63,25 +69,29 @@
     @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
-  /* Card variants */
+  /* Card variants - Dark */
   .card {
-    @apply bg-white rounded-2xl shadow-card;
+    @apply bg-dark-800 rounded-xl border border-dark-600 shadow-card-dark;
   }
 
   .card-elevated {
-    @apply bg-white rounded-2xl shadow-elevated;
+    @apply bg-dark-800 rounded-xl border border-dark-600 shadow-elevated-dark;
   }
 
-  /* Input styles */
+  .card-glow {
+    @apply bg-dark-800 rounded-xl border border-cyber-500/20 shadow-glow;
+  }
+
+  /* Input styles - Dark */
   .input {
-    @apply w-full px-4 py-3 border border-gray-200 rounded-xl;
-    @apply focus:border-primary-500 focus:ring-4 focus:ring-primary-100;
+    @apply w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-xl text-white;
+    @apply focus:border-cyber-500 focus:ring-2 focus:ring-cyber-500/20;
     @apply outline-none transition-all duration-200;
-    @apply placeholder:text-gray-400;
+    @apply placeholder:text-gray-500;
   }
 
   .input-lg {
-    @apply px-5 py-4 text-lg rounded-2xl;
+    @apply px-5 py-4 text-lg rounded-xl;
   }
 
   /* Section spacing */
@@ -89,19 +99,43 @@
     @apply py-12 md:py-16 lg:py-20;
   }
 
-  /* Glass effect */
+  /* Glass effect - Dark */
   .glass {
-    @apply bg-white/80 backdrop-blur-sm;
+    @apply bg-dark-800/80 backdrop-blur-md border border-dark-600/50;
+  }
+
+  /* Cyber button */
+  .btn-cyber {
+    @apply px-6 py-3 bg-cyber-500 text-dark-900 font-semibold rounded-lg;
+    @apply hover:bg-cyber-400 hover:shadow-glow transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 bg-transparent border border-cyber-500 text-cyber-400 font-medium rounded-lg;
+    @apply hover:bg-cyber-500/10 transition-all duration-200;
+  }
+
+  /* Neon text */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+
+  .text-glow-neon {
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(168, 85, 247, 0.3);
   }
 }
 
 /* ========================================
-   Utility Classes
+   Utility Classes - Dark Theme
    ======================================== */
 @layer utilities {
-  /* Text gradient */
+  /* Text gradient - Cyber */
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyber-400 to-neon-400;
+  }
+
+  .text-gradient-cyber {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyber-300 via-cyber-400 to-cyber-500;
   }
 
   /* Hide scrollbar */
@@ -113,40 +147,50 @@
     display: none;
   }
 
-  /* Custom scrollbar */
+  /* Custom scrollbar - Dark */
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f1f5f9;
+    scrollbar-color: #374151 #111827;
   }
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-100 rounded-full;
+    @apply bg-dark-800 rounded-full;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+    @apply bg-dark-500 rounded-full hover:bg-cyber-600;
   }
 
   /* Line clamp */
   .line-clamp-1 {
     display: -webkit-box;
     -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  /* Grid background pattern */
+  .bg-grid {
+    background-image: linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 }
 
@@ -164,7 +208,7 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #1a2332 25%, #243044 50%, #1a2332 75%);
   background-size: 200% 100%;
 }
 
@@ -194,6 +238,20 @@
   }
 }
 
+/* Glow pulse animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
 /* ========================================
    Print Styles
    ======================================== */
@@ -204,10 +262,12 @@
 
   body {
     background: white;
+    color: black;
   }
 
   .card {
     box-shadow: none;
     border: 1px solid #e5e7eb;
+    background: white;
   }
 }

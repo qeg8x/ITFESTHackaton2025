@@ -106,9 +106,9 @@ export const ChatBotTab = () => {
   ];
 
   return (
-    <div class="h-full flex flex-col bg-gray-50">
+    <div class="h-full flex flex-col bg-dark-900">
       {/* Messages Area */}
-      <div class="flex-1 overflow-y-auto p-4">
+      <div class="flex-1 overflow-y-auto p-4 scrollbar-thin">
         <div class="max-w-3xl mx-auto space-y-4">
           {messages.value.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />
@@ -117,14 +117,14 @@ export const ChatBotTab = () => {
           {/* Loading indicator */}
           {isLoading.value && (
             <div class="flex items-start gap-3">
-              <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm">
+              <div class="w-8 h-8 bg-gradient-to-br from-cyber-400 to-cyber-600 rounded-full flex items-center justify-center text-white text-sm shadow-glow-sm">
                 🤖
               </div>
-              <div class="bg-white p-4 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm">
+              <div class="bg-dark-800 p-4 rounded-2xl rounded-tl-none border border-dark-600">
                 <div class="flex gap-1">
-                  <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                  <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s" />
-                  <span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s" />
+                  <span class="w-2 h-2 bg-cyber-400 rounded-full animate-bounce" />
+                  <span class="w-2 h-2 bg-cyber-400 rounded-full animate-bounce" style="animation-delay: 0.1s" />
+                  <span class="w-2 h-2 bg-cyber-400 rounded-full animate-bounce" style="animation-delay: 0.2s" />
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@ export const ChatBotTab = () => {
                   key={q}
                   type="button"
                   onClick={() => { inputValue.value = q; }}
-                  class="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-full hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                  class="px-3 py-1.5 text-sm bg-dark-800 border border-dark-600 text-gray-300 rounded-full hover:bg-cyber-500/10 hover:border-cyber-500/50 hover:text-cyber-400 transition-all"
                 >
                   {q}
                 </button>
@@ -156,7 +156,7 @@ export const ChatBotTab = () => {
       )}
 
       {/* Input Area */}
-      <div class="border-t border-gray-200 bg-white p-4">
+      <div class="border-t border-dark-600 bg-dark-800 p-4">
         <div class="max-w-3xl mx-auto">
           <div class="flex gap-3">
             <input
@@ -166,19 +166,19 @@ export const ChatBotTab = () => {
               onInput={(e) => { inputValue.value = (e.target as HTMLInputElement).value; }}
               onKeyDown={handleKeyDown}
               disabled={isLoading.value}
-              class="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none disabled:bg-gray-100"
+              class="flex-1 px-4 py-3 bg-dark-700 border border-dark-600 text-white rounded-xl focus:ring-2 focus:ring-cyber-500/20 focus:border-cyber-500 outline-none disabled:bg-dark-800 placeholder:text-gray-500 transition-all"
             />
             <button
               type="button"
               onClick={handleSend}
               disabled={!inputValue.value.trim() || isLoading.value}
-              class="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="px-6 py-3 bg-cyber-500 text-dark-900 font-medium rounded-xl hover:bg-cyber-400 hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <span class="hidden sm:inline">Отправить</span>
               <span class="sm:hidden">➤</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400 mt-2 text-center">
+          <p class="text-xs text-gray-500 mt-2 text-center">
             AI может давать неточные ответы. Проверяйте важную информацию.
           </p>
         </div>
@@ -192,7 +192,7 @@ interface MessageBubbleProps {
 }
 
 /**
- * Компонент пузыря сообщения
+ * Компонент пузыря сообщения - тёмная тема
  */
 const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isUser = message.role === 'user';
@@ -201,22 +201,22 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
     <div class={`flex items-start gap-3 ${isUser ? 'flex-row-reverse' : ''}`}>
       <div
         class={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm flex-shrink-0 ${
-          isUser ? 'bg-gray-600' : 'bg-blue-600'
+          isUser ? 'bg-neon-600' : 'bg-gradient-to-br from-cyber-400 to-cyber-600 shadow-glow-sm'
         }`}
       >
         {isUser ? '👤' : '🤖'}
       </div>
       <div
-        class={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+        class={`max-w-[80%] p-4 rounded-2xl ${
           isUser
-            ? 'bg-blue-600 text-white rounded-tr-none'
-            : 'bg-white border border-gray-200 rounded-tl-none'
+            ? 'bg-neon-600 text-white rounded-tr-none'
+            : 'bg-dark-800 border border-dark-600 text-gray-200 rounded-tl-none'
         }`}
       >
         <p class="whitespace-pre-wrap">{message.content}</p>
         <p
           class={`text-xs mt-2 ${
-            isUser ? 'text-blue-200' : 'text-gray-400'
+            isUser ? 'text-neon-200' : 'text-gray-500'
           }`}
         >
           {message.timestamp.toLocaleTimeString('ru-RU', {

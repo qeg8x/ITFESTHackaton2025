@@ -163,6 +163,40 @@ export interface Campus {
 }
 
 // ============================================
+// 3D туры
+// ============================================
+
+/**
+ * Источник 3D-тура
+ */
+export type ThreeDTourProvider = 'google' | 'yandex' | '2gis';
+
+/**
+ * Данные об отдельном источнике 3D-тура
+ */
+export interface ThreeDTourSource {
+  source: ThreeDTourProvider;
+  url: string;
+  latitude: number;
+  longitude: number;
+  address?: string;
+  available: boolean;
+  last_validated: Date;
+}
+
+/**
+ * Информация о 3D-турах кампуса
+ */
+export interface UniversityThreeDTour {
+  google_maps?: ThreeDTourSource;
+  yandex_panorama?: ThreeDTourSource;
+  twogis?: ThreeDTourSource;
+  primary_source?: ThreeDTourProvider;
+  available_sources: ThreeDTourProvider[];
+  last_updated?: Date;
+}
+
+// ============================================
 // Международное
 // ============================================
 
@@ -262,6 +296,7 @@ export interface University {
   contacts?: Contacts;
   international?: International;
   other?: Other;
+  '3d_tour'?: UniversityThreeDTour;
   
   // Метаданные
   metadata?: ParseMetadata;

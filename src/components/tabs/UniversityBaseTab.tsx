@@ -62,9 +62,9 @@ export const UniversityBaseTab = () => {
   });
 
   return (
-    <div class="h-full flex flex-col">
+    <div class="h-full flex flex-col bg-dark-900">
       {/* Filters */}
-      <div class="bg-white border-b border-gray-200 p-4">
+      <div class="bg-dark-800 border-b border-dark-600 p-4">
         <div class="max-w-6xl mx-auto">
           <div class="flex flex-col sm:flex-row gap-4">
             {/* Search */}
@@ -79,7 +79,7 @@ export const UniversityBaseTab = () => {
                     search: (e.target as HTMLInputElement).value,
                   };
                 }}
-                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all"
+                class="w-full px-4 py-2.5 bg-dark-700 border border-dark-600 text-white rounded-lg focus:ring-2 focus:ring-cyber-500/20 focus:border-cyber-500 outline-none placeholder:text-gray-500 transition-all"
               />
             </div>
 
@@ -93,7 +93,7 @@ export const UniversityBaseTab = () => {
                     country: (e.target as HTMLSelectElement).value,
                   };
                 }}
-                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all bg-white"
+                class="w-full px-4 py-2.5 bg-dark-700 border border-dark-600 text-white rounded-lg focus:ring-2 focus:ring-cyber-500/20 focus:border-cyber-500 outline-none transition-all"
               >
                 <option value="">Все страны</option>
                 {countries.value.map((country) => (
@@ -107,22 +107,22 @@ export const UniversityBaseTab = () => {
 
           {/* Stats */}
           <div class="mt-3 text-sm text-gray-500">
-            Найдено: {filteredUniversities.length} из {universities.value.length}
+            Найдено: <span class="text-cyber-400">{filteredUniversities.length}</span> из {universities.value.length}
           </div>
         </div>
       </div>
 
       {/* Universities List */}
-      <div class="flex-1 overflow-y-auto p-4">
+      <div class="flex-1 overflow-y-auto p-4 scrollbar-thin">
         <div class="max-w-6xl mx-auto">
           {loading.value ? (
             <div class="flex items-center justify-center py-12">
-              <div class="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+              <div class="animate-spin w-8 h-8 border-4 border-cyber-500 border-t-transparent rounded-full" />
             </div>
           ) : filteredUniversities.length === 0 ? (
             <div class="text-center py-12">
               <span class="text-4xl">📚</span>
-              <p class="mt-4 text-gray-600">Университеты не найдены</p>
+              <p class="mt-4 text-gray-500">Университеты не найдены</p>
             </div>
           ) : (
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -142,18 +142,18 @@ interface UniversityCardProps {
 }
 
 /**
- * Карточка университета в списке
+ * Карточка университета - тёмная тема
  */
 const UniversityCard = ({ university }: UniversityCardProps) => (
   <a
     href={`/universities/${university.id}`}
-    class="block p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-200"
+    class="block p-4 bg-dark-800 border border-dark-600 rounded-xl hover:border-cyber-500/50 hover:shadow-glow transition-all duration-200 group"
   >
-    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{university.name}</h3>
+    <h3 class="font-semibold text-white mb-2 line-clamp-2 group-hover:text-cyber-400 transition-colors">{university.name}</h3>
     {university.name_en && (
       <p class="text-sm text-gray-500 mb-2 line-clamp-1">{university.name_en}</p>
     )}
-    <div class="flex items-center gap-2 text-sm text-gray-600">
+    <div class="flex items-center gap-2 text-sm text-gray-400">
       <span>📍</span>
       <span>
         {university.country}, {university.city}
@@ -164,13 +164,13 @@ const UniversityCard = ({ university }: UniversityCardProps) => (
         {university.programs_count} программ
       </span>
       <div class="flex items-center gap-1">
-        <div class="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div class="w-16 h-1.5 bg-dark-600 rounded-full overflow-hidden">
           <div
-            class="h-full bg-green-500 rounded-full"
+            class="h-full bg-gradient-to-r from-cyber-500 to-matrix-500 rounded-full"
             style={{ width: `${university.completeness}%` }}
           />
         </div>
-        <span class="text-xs text-gray-400">{university.completeness}%</span>
+        <span class="text-xs text-gray-500">{university.completeness}%</span>
       </div>
     </div>
   </a>

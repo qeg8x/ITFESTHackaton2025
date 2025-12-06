@@ -32,15 +32,20 @@ export const MainLayout = ({
   const { t } = useLanguage();
 
   return (
-    <div class="min-h-screen flex flex-col bg-gray-50">
+    <div class="min-h-screen flex flex-col bg-dark-900 bg-grid">
       {/* Header */}
-      <header class="bg-white border-b border-gray-200 sticky top-0 z-20">
+      <header class="bg-dark-800/90 backdrop-blur-md border-b border-dark-600 sticky top-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div class="flex justify-between items-center">
             {/* Logo */}
-            <a href="/" class="flex items-center gap-2 group">
-              <span class="text-2xl group-hover:scale-110 transition-transform">🎓</span>
-              <span class="font-bold text-xl text-gray-900">{t('common.appTitle')}</span>
+            <a href="/" class="flex items-center gap-3 group">
+              <div class="w-10 h-10 bg-gradient-to-br from-cyber-400 to-cyber-600 rounded-lg flex items-center justify-center shadow-glow-sm group-hover:shadow-glow transition-all">
+                <span class="text-xl">🎓</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="font-bold text-lg text-white">{t('common.appTitle')}</span>
+                <span class="text-xs text-cyber-400 -mt-1 hidden sm:block">AI-платформа</span>
+              </div>
             </a>
             
             {/* Language Selector */}
@@ -63,14 +68,14 @@ export const MainLayout = ({
       <main class="flex-1 flex flex-col">{children}</main>
 
       {/* Footer */}
-      <footer class="bg-white border-t border-gray-200 py-4">
+      <footer class="bg-dark-800/50 border-t border-dark-600 py-4">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-2 text-sm text-gray-500">
             <div class="flex items-center gap-2">
-              <span>🎓</span>
+              <span class="text-cyber-400">⚡</span>
               <span>{t('footer.copyright')}</span>
             </div>
-            <p>{t('footer.dataUpdated')}</p>
+            <p class="text-gray-600">{t('footer.dataUpdated')}</p>
           </div>
         </div>
       </footer>

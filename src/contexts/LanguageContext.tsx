@@ -195,7 +195,7 @@ export const useLanguage = (): LanguageContextType => {
 };
 
 /**
- * Компонент переключателя языка
+ * Компонент переключателя языка - тёмная тема
  */
 export const LanguageSwitcher = () => {
   const { language, setLanguage } = useLanguage();
@@ -208,7 +208,7 @@ export const LanguageSwitcher = () => {
       <button
         type="button"
         onClick={() => { isOpen.value = !isOpen.value; }}
-        class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+        class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-dark-700 border border-dark-600 transition-all"
       >
         <span>{currentLang.flag}</span>
         <span class="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
@@ -231,7 +231,7 @@ export const LanguageSwitcher = () => {
           />
           
           {/* Dropdown */}
-          <div class="absolute right-0 top-full mt-1 py-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-32">
+          <div class="absolute right-0 top-full mt-1 py-1 bg-dark-800 border border-dark-600 rounded-lg shadow-elevated-dark z-50 min-w-32">
             {LANGUAGES.map((lang) => (
               <button
                 key={lang.code}
@@ -240,8 +240,10 @@ export const LanguageSwitcher = () => {
                   setLanguage(lang.code);
                   isOpen.value = false;
                 }}
-                class={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-gray-50 transition-colors ${
-                  language.value === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                class={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
+                  language.value === lang.code 
+                    ? 'bg-cyber-500/10 text-cyber-400' 
+                    : 'text-gray-300 hover:bg-dark-700'
                 }`}
               >
                 <span>{lang.flag}</span>

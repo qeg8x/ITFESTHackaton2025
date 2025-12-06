@@ -94,21 +94,21 @@ export default function AdminLogs() {
   };
 
   return (
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-dark-900">
       {/* Header */}
-      <header class="bg-white shadow">
+      <header class="bg-dark-800 border-b border-dark-600">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-4">
-              <a href="/admin" class="text-blue-600 hover:text-blue-800">
+              <a href="/admin" class="text-cyber-400 hover:text-cyber-300">
                 ← Назад
               </a>
-              <h1 class="text-2xl font-bold text-gray-900">📋 Логи действий</h1>
+              <h1 class="text-2xl font-bold text-white">📋 Логи действий</h1>
             </div>
             <button
               type="button"
               onClick={logout}
-              class="text-sm text-red-600 hover:text-red-800"
+              class="text-sm text-red-400 hover:text-red-300"
             >
               Выйти
             </button>
@@ -119,16 +119,16 @@ export default function AdminLogs() {
       {/* Breadcrumbs */}
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <ol class="flex items-center space-x-2 text-sm text-gray-500">
-          <li><a href="/admin" class="hover:text-blue-600">Админ</a></li>
+          <li><a href="/admin" class="hover:text-cyber-400">Админ</a></li>
           <li>/</li>
-          <li class="text-gray-900">Логи</li>
+          <li class="text-white">Логи</li>
         </ol>
       </nav>
 
       {/* Content */}
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filters */}
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="bg-dark-800 rounded-lg border border-dark-600 p-4 mb-6">
           <div class="flex flex-wrap gap-4 items-center">
             <div class="flex-1 min-w-[200px]">
               <input
@@ -136,13 +136,13 @@ export default function AdminLogs() {
                 placeholder="Поиск..."
                 value={search}
                 onInput={(e) => setSearch((e.target as HTMLInputElement).value)}
-                class="w-full px-4 py-2 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-4 py-2 bg-dark-700 border border-dark-600 text-white rounded-lg focus:ring-cyber-500 focus:border-cyber-500 placeholder-gray-500"
               />
             </div>
             <select
               value={filterAction}
               onChange={(e) => setFilterAction((e.target as HTMLSelectElement).value as FilterAction)}
-              class="px-4 py-2 border rounded-lg"
+              class="px-4 py-2 bg-dark-700 border border-dark-600 text-white rounded-lg"
             >
               <option value="all">Все действия</option>
               <option value="create">Создание</option>
@@ -153,14 +153,14 @@ export default function AdminLogs() {
             <button
               type="button"
               onClick={loadLogs}
-              class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              class="px-4 py-2 bg-dark-700 text-gray-300 rounded-lg hover:bg-dark-600 border border-dark-600"
             >
               🔄 Обновить
             </button>
             <button
               type="button"
               onClick={exportCSV}
-              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              class="px-4 py-2 bg-matrix-500 text-dark-900 font-medium rounded-lg hover:bg-matrix-400"
             >
               📥 Экспорт CSV
             </button>
@@ -169,7 +169,7 @@ export default function AdminLogs() {
 
         {/* Error */}
         {error && (
-          <div class="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+          <div class="mb-4 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg">
             {error}
             <button type="button" onClick={() => setError(null)} class="ml-2">×</button>
           </div>
@@ -178,73 +178,73 @@ export default function AdminLogs() {
         {/* Logs Table */}
         {isLoading ? (
           <div class="text-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyber-500 mx-auto"></div>
           </div>
         ) : filteredLogs.length === 0 ? (
           <div class="text-center py-12 text-gray-500">
             Логи не найдены
           </div>
         ) : (
-          <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="bg-dark-800 border border-dark-600 rounded-lg overflow-hidden">
             <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+              <table class="min-w-full divide-y divide-dark-600">
+                <thead class="bg-dark-700">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Время
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Админ
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Действие
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Ресурс
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Статус
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                       Детали
                     </th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+                <tbody class="bg-dark-800 divide-y divide-dark-600">
                   {filteredLogs.map((log, idx) => (
-                    <tr key={idx} class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <tr key={idx} class="hover:bg-dark-700">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                         {new Date(log.timestamp).toLocaleString('ru')}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">
+                        <div class="text-sm font-medium text-white">
                           {log.admin_name || 'Admin'}
                         </div>
                         <div class="text-xs text-gray-500">{log.admin_key_masked}</div>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span class={`px-2 py-1 text-xs rounded ${
-                          log.action.includes('create') ? 'bg-green-100 text-green-800' :
-                          log.action.includes('delete') ? 'bg-red-100 text-red-800' :
-                          log.action.includes('update') ? 'bg-blue-100 text-blue-800' :
-                          'bg-gray-100 text-gray-800'
+                          log.action.includes('create') ? 'bg-green-500/20 text-green-400' :
+                          log.action.includes('delete') ? 'bg-red-500/20 text-red-400' :
+                          log.action.includes('update') ? 'bg-cyber-500/20 text-cyber-400' :
+                          'bg-dark-600 text-gray-400'
                         }`}>
                           {log.action}
                         </span>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                         {log.resource_type}
                         {log.resource_id && (
-                          <span class="text-xs text-gray-400 ml-1">
+                          <span class="text-xs text-gray-500 ml-1">
                             #{log.resource_id.slice(0, 8)}
                           </span>
                         )}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         {log.success ? (
-                          <span class="text-green-600">✓ OK</span>
+                          <span class="text-green-400">✓ OK</span>
                         ) : (
-                          <span class="text-red-600">✗ Error</span>
+                          <span class="text-red-400">✗ Error</span>
                         )}
                       </td>
                       <td class="px-6 py-4 text-sm text-gray-500">
@@ -252,7 +252,7 @@ export default function AdminLogs() {
                           <button
                             type="button"
                             onClick={() => alert(JSON.stringify(log.details, null, 2))}
-                            class="text-blue-600 hover:underline"
+                            class="text-cyber-400 hover:underline"
                           >
                             Показать
                           </button>
