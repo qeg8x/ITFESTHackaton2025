@@ -1,5 +1,5 @@
 import { Handlers } from '$fresh/server.ts';
-import { getAllUniversities, getCountries, getCities } from '../../../src/services/universities.service.ts';
+import { getAllUniversities } from '../../../src/services/universities.service.ts';
 import { logger } from '../../../src/utils/logger.ts';
 
 /**

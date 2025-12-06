@@ -20,3 +20,14 @@ export {
   initDatabase,
   closePool,
 } from './database.ts';
+
+export {
+  validateAdminKey,
+  getAdminInfo,
+  hasPermission,
+  maskKey,
+  getAdminCount,
+  clearAdminKeysCache,
+  type AdminInfo,
+  type AdminPermission,
+} from './admin.ts';

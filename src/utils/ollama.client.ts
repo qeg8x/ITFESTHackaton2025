@@ -5,8 +5,8 @@ import { logger } from './logger.ts';
  */
 const OLLAMA_CONFIG = {
   baseUrl: Deno.env.get('OLLAMA_URL') ?? 'http://localhost:11434',
-  model: 'llama3',
-  timeout: 60000, // 60 секунд для генерации
+  model: Deno.env.get('OLLAMA_MODEL') ?? 'deepseek-v3.1:671b-cloud',
+  timeout: 120000, // 120 секунд для генерации (cloud модели могут быть медленнее)
   maxRetries: 2,
 };
 
@@ -194,20 +194,20 @@ export const callOllama = async (
 
 /**
  * Вызвать Ollama для извлечения JSON
- * @param prompt - промпт
- * @param schema - описание ожидаемой JSON схемы
+ * @param prompt - промпт (может включать схему)
+ * @param schema - описание ожидаемой JSON схемы (опционально)
  * @returns распарсенный JSON
  */
 export const callOllamaForJson = async <T>(
   prompt: string,
-  schema: string
+  schema?: string
 ): Promise<T> => {
-  const systemPrompt = `You are a data extraction assistant. Extract information from the provided text and return it as valid JSON.
-Follow the exact JSON schema provided. Only output valid JSON, nothing else.
-Do not include any explanations, markdown formatting, or code blocks - just pure JSON.
+  const schemaHint = schema 
+    ? `\n\nExpected JSON Schema:\n${schema}` 
+    : '';
 
-Expected JSON Schema:
-${schema}`;
+  const systemPrompt = `You are a data extraction assistant. Extract information from the provided text and return it as valid JSON.
+Only output valid JSON, nothing else. Do not include any explanations, markdown formatting, or code blocks - just pure JSON.${schemaHint}`;
 
   const response = await callOllama(prompt, {
     system: systemPrompt,

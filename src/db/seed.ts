@@ -55,7 +55,7 @@ const TEST_UNIVERSITIES: Array<{
         start_date: '2025-09-01',
       },
       scholarships: [
-        { name: 'Полный грант', amount: 100, description: 'Покрывает обучение и проживание' },
+        { name: 'Полный грант', amount: '100%', description: 'Покрывает обучение и проживание' },
       ],
       contacts: {
         email: 'admissions@nu.edu.kz',
@@ -63,7 +63,7 @@ const TEST_UNIVERSITIES: Array<{
         address: 'Кабанбай батыра 53, Астана',
       },
       ratings: [
-        { source: 'QS World', rank: 211, year: 2024 },
+        { source: 'QS World', rank: 211, year: 2024, category: 'Overall' },
       ] as Rating[],
     },
   },
@@ -110,7 +110,7 @@ const TEST_UNIVERSITIES: Array<{
         address: 'Ленинские горы, 1, Москва',
       },
       ratings: [
-        { source: 'QS World', rank: 87, year: 2024 },
+        { source: 'QS World', rank: 87, year: 2024, category: 'Overall' },
       ] as Rating[],
     },
   },
@@ -149,7 +149,7 @@ const TEST_UNIVERSITIES: Array<{
         address: 'Университетская наб., 7-9, Санкт-Петербург',
       },
       ratings: [
-        { source: 'QS World', rank: 264, year: 2024 },
+        { source: 'QS World', rank: 264, year: 2024, category: 'Overall' },
       ] as Rating[],
     },
   },
@@ -195,7 +195,7 @@ const TEST_UNIVERSITIES: Array<{
         address: 'Толе би 59, Алматы',
       },
       ratings: [
-        { source: 'QS EECA', rank: 120, year: 2024 },
+        { source: 'QS EECA', rank: 120, year: 2024, category: 'Regional' },
       ] as Rating[],
     },
   },

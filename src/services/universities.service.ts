@@ -1,4 +1,4 @@
-import { query, queryOne, transaction } from '../config/database.ts';
+import { query, queryOne } from '../config/database.ts';
 import { logger } from '../utils/logger.ts';
 import type {
   UniversityRow,
@@ -6,7 +6,6 @@ import type {
   UpdateLogRow,
   UniversityWithProfile,
   CreateUpdateLogInput,
-  UpdateStatus,
 } from '../types/database.ts';
 import type { University } from '../types/university.ts';
 

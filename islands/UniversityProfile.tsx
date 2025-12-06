@@ -66,7 +66,7 @@ export default function UniversityProfile({
     return (
       <ErrorMessage
         message={error.value}
-        onRetry={() => window.location.reload()}
+        onRetry={() => globalThis.location.reload()}
         fullScreen
       />
     );
@@ -182,13 +182,13 @@ export default function UniversityProfile({
         )}
 
         {/* Tuition */}
-        {p.tuition && (
+        {p.tuition && p.tuition.amount != null && (
           <section class="bg-white rounded-xl shadow-sm p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">
               💰 Стоимость обучения
             </h2>
             <div class="text-3xl font-bold text-green-600">
-              {new Intl.NumberFormat('ru-RU').format(p.tuition.amount)} {p.tuition.currency}
+              {new Intl.NumberFormat('ru-RU').format(p.tuition.amount)} {p.tuition.currency ?? 'USD'}
             </div>
             <p class="text-gray-500 mt-1">
               {p.tuition.per_year ? 'в год' : 'за весь период'}

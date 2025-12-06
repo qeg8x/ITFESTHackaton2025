@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger.ts';
 import { query } from '../config/database.ts';
-import { checkAndUpdateWebsite } from '../services/parser.service.ts';
+import { checkAndUpdateWebsite, resetAndReparseUniversity } from '../services/parser.service.ts';
 
 /**
  * Конфигурация воркера
@@ -76,9 +76,10 @@ const getSourcesForUpdate = async (): Promise<UpdateSource[]> => {
 /**
  * Обновить один источник с логированием
  * @param source - источник для обновления
+ * @param forceUpdate - принудительное обновление
  * @returns результат обновления
  */
-const updateSource = async (source: UpdateSource): Promise<UpdateSourceResult> => {
+const updateSource = async (source: UpdateSource, forceUpdate: boolean = false): Promise<UpdateSourceResult> => {
   const startTime = Date.now();
   
   try {
@@ -86,12 +87,14 @@ const updateSource = async (source: UpdateSource): Promise<UpdateSourceResult> =
       sourceId: source.id,
       university: source.university_name,
       url: source.url,
+      forceUpdate,
     });
     
     const result = await checkAndUpdateWebsite(
       source.university_id,
       source.id,
-      source.url
+      source.url,
+      forceUpdate
     );
     
     const duration = Date.now() - startTime;
@@ -310,12 +313,14 @@ export const triggerManualUpdate = async (): Promise<{
 /**
  * Обновить конкретный университет
  * @param universityId - ID университета
+ * @param forceUpdate - принудительное обновление (игнорировать хэш и completeness)
  * @returns результат обновления
  */
 export const updateUniversityNow = async (
-  universityId: string
+  universityId: string,
+  forceUpdate: boolean = true // По умолчанию принудительно обновляем при ручном запуске
 ): Promise<UpdateSourceResult | null> => {
-  logger.info('Manual university update triggered', { universityId });
+  logger.info('Manual university update triggered', { universityId, forceUpdate });
   
   // Найти источник
   const sources = await query<UpdateSource>(`
@@ -335,5 +340,118 @@ export const updateUniversityNow = async (
     return null;
   }
   
-  return await updateSource(sources[0]);
+  return await updateSource(sources[0], forceUpdate);
+};
+
+/**
+ * Полностью сбросить и перепарсить университет с нуля
+ * Удаляет все старые профили и создаёт новый
+ * @param universityId - ID университета
+ * @returns результат обновления
+ */
+export const resetUniversityNow = async (
+  universityId: string
+): Promise<UpdateSourceResult | null> => {
+  logger.info('University RESET triggered - will delete old profile and reparse', { universityId });
+  
+  // Найти источник
+  let sources = await query<UpdateSource>(`
+    SELECT 
+      s.id,
+      s.university_id,
+      s.url,
+      u.name as university_name
+    FROM university_sources s
+    JOIN universities u ON u.id = s.university_id
+    WHERE s.university_id = $1 AND s.is_active = true
+    LIMIT 1
+  `, [universityId]);
+  
+  // Если нет источника, попробуем создать из website_url университета
+  if (sources.length === 0) {
+    logger.info('No source found, trying to create from university website_url', { universityId });
+    
+    // Получить website_url из университета
+    const universities = await query<{ id: string; name: string; website_url: string }>(`
+      SELECT id, name, website_url FROM universities WHERE id = $1
+    `, [universityId]);
+    
+    if (universities.length === 0) {
+      logger.warn('University not found', { universityId });
+      return null;
+    }
+    
+    const uni = universities[0];
+    
+    if (!uni.website_url) {
+      logger.warn('University has no website_url', { universityId, name: uni.name });
+      return null;
+    }
+    
+    // Создать новый source
+    const newSources = await query<{ id: string }>(`
+      INSERT INTO university_sources (university_id, url, source_type, is_active)
+      VALUES ($1, $2, 'website', true)
+      RETURNING id
+    `, [universityId, uni.website_url]);
+    
+    if (newSources.length === 0) {
+      logger.error('Failed to create source', { universityId });
+      return null;
+    }
+    
+    logger.info('Created new source for university', { 
+      universityId, 
+      sourceId: newSources[0].id, 
+      url: uni.website_url 
+    });
+    
+    // Перезапросить sources
+    sources = await query<UpdateSource>(`
+      SELECT 
+        s.id,
+        s.university_id,
+        s.url,
+        u.name as university_name
+      FROM university_sources s
+      JOIN universities u ON u.id = s.university_id
+      WHERE s.university_id = $1 AND s.is_active = true
+      LIMIT 1
+    `, [universityId]);
+  }
+  
+  if (sources.length === 0) {
+    logger.warn('Still no source found for university', { universityId });
+    return null;
+  }
+  
+  const source = sources[0];
+  const startTime = Date.now();
+  
+  try {
+    const result = await resetAndReparseUniversity(
+      source.university_id,
+      source.id,
+      source.url
+    );
+    
+    return {
+      sourceId: source.id,
+      universityName: source.university_name,
+      success: !result.error,
+      updated: result.updated,
+      error: result.error,
+      duration_ms: Date.now() - startTime,
+    };
+  } catch (err) {
+    logger.error('University reset failed', { universityId, error: err });
+    return {
+      sourceId: source.id,
+      universityName: source.university_name,
+      success: false,
+      updated: false,
+      error: err instanceof Error ? err.message : String(err),
+      duration_ms: Date.now() - startTime,
+    };
+  }
 };

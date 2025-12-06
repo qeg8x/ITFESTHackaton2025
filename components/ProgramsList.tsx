@@ -36,11 +36,11 @@ const getDegreeBadgeColor = (level: string): string => {
 /**
  * Форматирование стоимости
  */
-const formatTuition = (tuition?: { amount: number; currency: string }): string => {
-  if (!tuition) return '—';
+const formatTuition = (tuition?: { amount?: number | null; currency?: string }): string => {
+  if (!tuition || tuition.amount == null) return '—';
   
   const formatter = new Intl.NumberFormat('ru-RU');
-  return `${formatter.format(tuition.amount)} ${tuition.currency}`;
+  return `${formatter.format(tuition.amount)} ${tuition.currency ?? 'USD'}`;
 };
 
 /**

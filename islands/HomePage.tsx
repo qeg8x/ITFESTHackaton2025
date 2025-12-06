@@ -393,11 +393,11 @@ const ProfileView = ({ profile: p }: { profile: University }) => (
       )}
 
       {/* Tuition */}
-      {p.tuition && (
+      {p.tuition && p.tuition.amount != null && (
         <div class="bg-white rounded-2xl shadow-sm p-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-3">💰 Стоимость</h3>
           <div class="text-3xl font-bold text-green-600">
-            {new Intl.NumberFormat('ru-RU').format(p.tuition.amount)} {p.tuition.currency}
+            {new Intl.NumberFormat('ru-RU').format(p.tuition.amount)} {p.tuition.currency ?? 'USD'}
           </div>
           <p class="text-gray-500">{p.tuition.per_year ? 'в год' : 'за весь период'}</p>
         </div>

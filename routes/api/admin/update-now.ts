@@ -1,11 +1,12 @@
 import { Handlers } from '$fresh/server.ts';
 import {
-  updateUniversityNow,
+  resetUniversityNow,
   triggerManualUpdate,
   getWorkerStatus,
 } from '../../../src/workers/update.worker.ts';
 import { getUniversityWithProfile } from '../../../src/services/universities.service.ts';
 import { logger } from '../../../src/utils/logger.ts';
+import { checkOllamaHealth } from '../../../src/utils/ollama.client.ts';
 
 /**
  * Проверка admin ключа
@@ -99,7 +100,24 @@ export const handler: Handlers = {
           );
         }
 
-        const result = await updateUniversityNow(universityId);
+        // Проверить доступность Ollama
+        const ollamaHealthy = await checkOllamaHealth();
+        if (!ollamaHealthy) {
+          logger.warn('Ollama is not available for parsing');
+          return new Response(
+            JSON.stringify({ 
+              success: false,
+              error: 'Ollama LLM is not available',
+              message: 'Cannot update: Ollama AI service is not running. Start Ollama with `ollama serve` and ensure the model is available.',
+              ollama_url: Deno.env.get('OLLAMA_URL') ?? 'http://localhost:11434',
+              ollama_model: Deno.env.get('OLLAMA_MODEL') ?? 'llama3',
+            }),
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Полный сброс и перепарсинг (удаляет старый профиль, создаёт новый)
+        const result = await resetUniversityNow(universityId);
 
         if (!result) {
           return new Response(

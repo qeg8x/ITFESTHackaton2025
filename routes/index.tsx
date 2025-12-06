@@ -1,9 +1,9 @@
 import { Head } from '$fresh/runtime.ts';
-import HomePage from '../islands/HomePage.tsx';
+import HomePageV2 from '../islands/HomePageV2.tsx';
 
 /**
  * Главная страница приложения "Цифровой университет"
- * Использует интерактивный island с поиском и просмотром профиля
+ * Использует интерактивный island с AI-поиском и созданием университетов
  */
 export default function Home() {
   return (
@@ -15,7 +15,7 @@ export default function Home() {
         <meta property="og:description" content="Платформа для выбора университета и сравнения образовательных программ" />
         <meta property="og:image" content="/og-image.png" />
       </Head>
-      <HomePage />
+      <HomePageV2 />
     </>
   );
 }

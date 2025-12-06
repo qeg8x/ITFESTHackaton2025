@@ -89,7 +89,7 @@ export default function UniversitySelector({
     }
 
     if (navigateOnSelect) {
-      window.location.href = `/universities/${university.id}`;
+      globalThis.location.href = `/universities/${university.id}`;
     }
   };
 

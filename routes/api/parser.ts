@@ -139,7 +139,7 @@ export const handler: Handlers = {
 
           const { html, hash } = await fetchAndHashWebsite(url);
           const markdown = htmlToMarkdown(html);
-          const profile = await markdownToUniversityProfile(markdown);
+          const profile = await markdownToUniversityProfile(markdown, url);
           const duration = Date.now() - startTime;
 
           return new Response(

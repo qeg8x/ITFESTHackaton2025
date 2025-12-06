@@ -1,4 +1,4 @@
-import { Options } from 'twind';
+import type { Options } from '$fresh/plugins/twind.ts';
 
 /**
  * Twind (Tailwind-in-JS) конфигурация для Fresh
@@ -6,7 +6,6 @@ import { Options } from 'twind';
  */
 export default {
   selfURL: import.meta.url,
-  
   theme: {
     extend: {
       // Кастомные цвета
@@ -38,4 +37,4 @@ export default {
       },
     },
   },
-} as Options;
+} satisfies Options;

@@ -5,10 +5,22 @@
 import * as $_404 from './routes/_404.tsx';
 import * as $_500 from './routes/_500.tsx';
 import * as $_app from './routes/_app.tsx';
+import * as $admin_index from './routes/admin/index.tsx';
+import * as $admin_logs from './routes/admin/logs.tsx';
+import * as $admin_settings from './routes/admin/settings.tsx';
+import * as $admin_universities_id_ from './routes/admin/universities/[id].tsx';
+import * as $api_admin_test_parser from './routes/api/admin/test-parser.ts';
+import * as $api_admin_universities from './routes/api/admin/universities.ts';
+import * as $api_admin_universities_id_profile from './routes/api/admin/universities/[id]/profile.ts';
+import * as $api_admin_universities_id_programs from './routes/api/admin/universities/[id]/programs.ts';
 import * as $api_admin_update_now from './routes/api/admin/update-now.ts';
 import * as $api_debug from './routes/api/debug.ts';
 import * as $api_filters from './routes/api/filters.ts';
 import * as $api_parser from './routes/api/parser.ts';
+import * as $api_search_create from './routes/api/search/create.ts';
+import * as $api_search_universities from './routes/api/search/universities.ts';
+import * as $api_search_verify from './routes/api/search/verify.ts';
+import * as $api_test_features from './routes/api/test/features.ts';
 import * as $api_universities_id_ from './routes/api/universities/[id].ts';
 import * as $api_universities_id_profile from './routes/api/universities/[id]/profile.ts';
 import * as $api_universities_index from './routes/api/universities/index.ts';
@@ -16,8 +28,28 @@ import * as $index from './routes/index.tsx';
 import * as $universities_id_ from './routes/universities/[id].tsx';
 import * as $universities_index from './routes/universities/index.tsx';
 import * as $HomePage from './islands/HomePage.tsx';
+import * as $HomePageV2 from './islands/HomePageV2.tsx';
 import * as $UniversityProfile from './islands/UniversityProfile.tsx';
+import * as $UniversitySearch from './islands/UniversitySearch.tsx';
 import * as $UniversitySelector from './islands/UniversitySelector.tsx';
+import * as $admin_AdminContext from './islands/admin/AdminContext.tsx';
+import * as $admin_AdminDashboard from './islands/admin/AdminDashboard.tsx';
+import * as $admin_AdminLogin from './islands/admin/AdminLogin.tsx';
+import * as $admin_AdminLogs from './islands/admin/AdminLogs.tsx';
+import * as $admin_AdminSettings from './islands/admin/AdminSettings.tsx';
+import * as $admin_AdminWrapper from './islands/admin/AdminWrapper.tsx';
+import * as $admin_UniversityEditor from './islands/admin/UniversityEditor.tsx';
+import * as $admin_editor_AdmissionsTab from './islands/admin/editor/AdmissionsTab.tsx';
+import * as $admin_editor_BasicInfoTab from './islands/admin/editor/BasicInfoTab.tsx';
+import * as $admin_editor_CampusTab from './islands/admin/editor/CampusTab.tsx';
+import * as $admin_editor_ContactsTab from './islands/admin/editor/ContactsTab.tsx';
+import * as $admin_editor_FormFields from './islands/admin/editor/FormFields.tsx';
+import * as $admin_editor_InternationalTab from './islands/admin/editor/InternationalTab.tsx';
+import * as $admin_editor_JSONTab from './islands/admin/editor/JSONTab.tsx';
+import * as $admin_editor_ProgramsTab from './islands/admin/editor/ProgramsTab.tsx';
+import * as $admin_editor_RankingsTab from './islands/admin/editor/RankingsTab.tsx';
+import * as $admin_editor_TuitionTab from './islands/admin/editor/TuitionTab.tsx';
+import * as $admin_editor_index from './islands/admin/editor/index.ts';
 import { type Manifest } from '$fresh/server.ts';
 
 const manifest = {
@@ -25,10 +57,22 @@ const manifest = {
     './routes/_404.tsx': $_404,
     './routes/_500.tsx': $_500,
     './routes/_app.tsx': $_app,
+    './routes/admin/index.tsx': $admin_index,
+    './routes/admin/logs.tsx': $admin_logs,
+    './routes/admin/settings.tsx': $admin_settings,
+    './routes/admin/universities/[id].tsx': $admin_universities_id_,
+    './routes/api/admin/test-parser.ts': $api_admin_test_parser,
+    './routes/api/admin/universities.ts': $api_admin_universities,
+    './routes/api/admin/universities/[id]/profile.ts': $api_admin_universities_id_profile,
+    './routes/api/admin/universities/[id]/programs.ts': $api_admin_universities_id_programs,
     './routes/api/admin/update-now.ts': $api_admin_update_now,
     './routes/api/debug.ts': $api_debug,
     './routes/api/filters.ts': $api_filters,
     './routes/api/parser.ts': $api_parser,
+    './routes/api/search/create.ts': $api_search_create,
+    './routes/api/search/universities.ts': $api_search_universities,
+    './routes/api/search/verify.ts': $api_search_verify,
+    './routes/api/test/features.ts': $api_test_features,
     './routes/api/universities/[id].ts': $api_universities_id_,
     './routes/api/universities/[id]/profile.ts': $api_universities_id_profile,
     './routes/api/universities/index.ts': $api_universities_index,
@@ -38,8 +82,28 @@ const manifest = {
   },
   islands: {
     './islands/HomePage.tsx': $HomePage,
+    './islands/HomePageV2.tsx': $HomePageV2,
     './islands/UniversityProfile.tsx': $UniversityProfile,
+    './islands/UniversitySearch.tsx': $UniversitySearch,
     './islands/UniversitySelector.tsx': $UniversitySelector,
+    './islands/admin/AdminContext.tsx': $admin_AdminContext,
+    './islands/admin/AdminDashboard.tsx': $admin_AdminDashboard,
+    './islands/admin/AdminLogin.tsx': $admin_AdminLogin,
+    './islands/admin/AdminLogs.tsx': $admin_AdminLogs,
+    './islands/admin/AdminSettings.tsx': $admin_AdminSettings,
+    './islands/admin/AdminWrapper.tsx': $admin_AdminWrapper,
+    './islands/admin/UniversityEditor.tsx': $admin_UniversityEditor,
+    './islands/admin/editor/AdmissionsTab.tsx': $admin_editor_AdmissionsTab,
+    './islands/admin/editor/BasicInfoTab.tsx': $admin_editor_BasicInfoTab,
+    './islands/admin/editor/CampusTab.tsx': $admin_editor_CampusTab,
+    './islands/admin/editor/ContactsTab.tsx': $admin_editor_ContactsTab,
+    './islands/admin/editor/FormFields.tsx': $admin_editor_FormFields,
+    './islands/admin/editor/InternationalTab.tsx': $admin_editor_InternationalTab,
+    './islands/admin/editor/JSONTab.tsx': $admin_editor_JSONTab,
+    './islands/admin/editor/ProgramsTab.tsx': $admin_editor_ProgramsTab,
+    './islands/admin/editor/RankingsTab.tsx': $admin_editor_RankingsTab,
+    './islands/admin/editor/TuitionTab.tsx': $admin_editor_TuitionTab,
+    './islands/admin/editor/index.ts': $admin_editor_index,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
