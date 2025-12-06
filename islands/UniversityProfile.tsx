@@ -5,6 +5,7 @@ import { ProgramsList } from '../components/ProgramsList.tsx';
 import { ProfileSkeleton } from '../components/Loading.tsx';
 import { ErrorMessage } from '../components/ErrorMessage.tsx';
 import { UniversityMapStatic } from '../src/components/UniversityMap.tsx';
+import Tour3DSection from './Tour3DSection.tsx';
 
 /**
  * Props для профиля университета
@@ -265,6 +266,9 @@ export default function UniversityProfile({
           </div>
         </section>
       )}
+
+      {/* 3D Tour */}
+      <Tour3DSection universityId={universityId} universityName={p.name} />
 
       {/* Map */}
       {p.latitude && p.longitude && (

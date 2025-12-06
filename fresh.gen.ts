@@ -24,6 +24,7 @@ import * as $api_search_universities from './routes/api/search/universities.ts';
 import * as $api_search_verify from './routes/api/search/verify.ts';
 import * as $api_test_features from './routes/api/test/features.ts';
 import * as $api_universities_id_ from './routes/api/universities/[id].ts';
+import * as $api_universities_id_3d_tour from './routes/api/universities/[id]/3d-tour.ts';
 import * as $api_universities_id_profile from './routes/api/universities/[id]/profile.ts';
 import * as $api_universities_compare from './routes/api/universities/compare.ts';
 import * as $api_universities_filtered from './routes/api/universities/filtered.ts';
@@ -34,6 +35,7 @@ import * as $universities_index from './routes/universities/index.tsx';
 import * as $HomePage from './islands/HomePage.tsx';
 import * as $HomePageV2 from './islands/HomePageV2.tsx';
 import * as $MainPage from './islands/MainPage.tsx';
+import * as $Tour3DSection from './islands/Tour3DSection.tsx';
 import * as $UniversityProfile from './islands/UniversityProfile.tsx';
 import * as $UniversitySearch from './islands/UniversitySearch.tsx';
 import * as $UniversitySelector from './islands/UniversitySelector.tsx';
@@ -81,6 +83,7 @@ const manifest = {
     './routes/api/search/verify.ts': $api_search_verify,
     './routes/api/test/features.ts': $api_test_features,
     './routes/api/universities/[id].ts': $api_universities_id_,
+    './routes/api/universities/[id]/3d-tour.ts': $api_universities_id_3d_tour,
     './routes/api/universities/[id]/profile.ts': $api_universities_id_profile,
     './routes/api/universities/compare.ts': $api_universities_compare,
     './routes/api/universities/filtered.ts': $api_universities_filtered,
@@ -93,6 +96,7 @@ const manifest = {
     './islands/HomePage.tsx': $HomePage,
     './islands/HomePageV2.tsx': $HomePageV2,
     './islands/MainPage.tsx': $MainPage,
+    './islands/Tour3DSection.tsx': $Tour3DSection,
     './islands/UniversityProfile.tsx': $UniversityProfile,
     './islands/UniversitySearch.tsx': $UniversitySearch,
     './islands/UniversitySelector.tsx': $UniversitySelector,

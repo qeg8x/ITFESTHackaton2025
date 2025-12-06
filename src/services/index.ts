@@ -5,13 +5,6 @@
 export {
   getAllUniversities,
   getUniversityById,
-  getUniversityWithProfile,
-  getUniversityProfile,
-  updateUniversityProfile,
-  logUpdateAttempt,
-  getCountries,
-  getCities,
-  type UniversityRowExtended,
 } from './universities.service.ts';
 
 export {
@@ -67,3 +60,21 @@ export {
   getSearchStats,
   type DbSearchResult,
 } from './search.service.ts';
+
+// 3D Tour services
+export {
+  TourService,
+  getTourService,
+  type TourApiResponse,
+} from './tour.service.ts';
+
+export {
+  CacheManager,
+  getCacheManager,
+} from './cache.service.ts';
+
+export {
+  TourSourceSelector,
+  getTourSourceSelector,
+  type SelectedSource,
+} from './tour-source-selector.service.ts';

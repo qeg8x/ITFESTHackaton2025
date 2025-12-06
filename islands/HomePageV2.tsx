@@ -66,7 +66,7 @@ export default function HomePageV2() {
       <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section class="py-16 md:py-24 text-center">
           <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Найдите свой <span class="text-blue-600">идеальный</span> университет
+            Найдите <span class="text-blue-600">тот самый</span> университет
           </h1>
           <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Умный поиск с AI-проверкой. Если университета нет в базе — 

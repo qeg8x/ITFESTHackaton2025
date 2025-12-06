@@ -48,7 +48,7 @@ export const SmartSearchTab = () => {
         <div class="absolute inset-0 bg-grid opacity-50" />
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
           <h1 class="text-2xl md:text-3xl font-bold text-white mb-3">
-            Найдите свой <span class="text-gradient">идеальный</span> университет
+            Найдите <span class="text-gradient">тот самый</span> университет
           </h1>
           <p class="text-gray-400 mb-6 max-w-xl mx-auto">
             Поиск в базе или добавление нового через AI

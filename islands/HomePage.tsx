@@ -131,7 +131,7 @@ export default function HomePage() {
       <section class="py-12 md:py-20">
         <div class="max-w-4xl mx-auto px-4 text-center">
           <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-            Найдите свой <span class="text-blue-600">идеальный</span> университет
+            Найдите <span class="text-blue-600">тот самый</span> университет
           </h2>
           <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Исследуйте профили вузов, сравнивайте программы и делайте осознанный выбор

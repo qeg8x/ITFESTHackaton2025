@@ -10,7 +10,7 @@ export default function Home() {
     <>
       <Head>
         <title>Цифровой университет — Платформа выбора вуза</title>
-        <meta name="description" content="Найдите идеальный университет: программы, стоимость, требования к поступлению. Данные обновляются автоматически с помощью AI." />
+        <meta name="description" content="Найдите тот самый университет: программы, стоимость, требования к поступлению. Данные обновляются автоматически с помощью AI." />
         <meta property="og:title" content="Цифровой университет" />
         <meta property="og:description" content="Платформа для выбора университета и сравнения образовательных программ" />
         <meta property="og:image" content="/og-image.png" />
